@@ -8,7 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		9B3411792647909200122D3E /* UserAccountTool.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B3411782647909200122D3E /* UserAccountTool.m */; };
-		9B65028F264781540074D6A0 /* weiboMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B65028E264781540074D6A0 /* weiboMessage.m */; };
+		9B34117C2647F65800122D3E /* Useraccount.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B34117B2647F65800122D3E /* Useraccount.m */; };
+		9B341208264842DA00122D3E /* MessageCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B341207264842DA00122D3E /* MessageCell.m */; };
+		9B34120C26495A5A00122D3E /* UserModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B34120B26495A5A00122D3E /* UserModel.m */; };
+		9B34120F26497F7A00122D3E /* WeiboMessageFrame.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B34120E26497F7A00122D3E /* WeiboMessageFrame.m */; };
+		9B65028F264781540074D6A0 /* WeiboMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B65028E264781540074D6A0 /* WeiboMessage.m */; };
 		9B7D578D263EB4D900E8B2A1 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B7D578C263EB4D900E8B2A1 /* AppDelegate.m */; };
 		9B7D5790263EB4D900E8B2A1 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B7D578F263EB4D900E8B2A1 /* SceneDelegate.m */; };
 		9B7D5798263EB4DA00E8B2A1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9B7D5797263EB4DA00E8B2A1 /* Assets.xcassets */; };
@@ -22,7 +26,6 @@
 		9B7D57D4263EC86900E8B2A1 /* LaunchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B7D57D3263EC86900E8B2A1 /* LaunchViewController.m */; };
 		9B7D57F026453D2C00E8B2A1 /* VisitorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B7D57EF26453D2C00E8B2A1 /* VisitorViewController.m */; };
 		9B7D584626457A2500E8B2A1 /* LoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B7D584526457A2500E8B2A1 /* LoginViewController.m */; };
-		9B7D58492646C14E00E8B2A1 /* UserAccount.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B7D58482646C14E00E8B2A1 /* UserAccount.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -45,8 +48,16 @@
 /* Begin PBXFileReference section */
 		9B3411772647909200122D3E /* UserAccountTool.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UserAccountTool.h; sourceTree = "<group>"; };
 		9B3411782647909200122D3E /* UserAccountTool.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UserAccountTool.m; sourceTree = "<group>"; };
-		9B65028D264781540074D6A0 /* weiboMessage.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = weiboMessage.h; sourceTree = "<group>"; };
-		9B65028E264781540074D6A0 /* weiboMessage.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = weiboMessage.m; sourceTree = "<group>"; };
+		9B34117A2647F65800122D3E /* UserAccount.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UserAccount.h; sourceTree = "<group>"; };
+		9B34117B2647F65800122D3E /* Useraccount.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Useraccount.m; sourceTree = "<group>"; };
+		9B341206264842DA00122D3E /* MessageCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MessageCell.h; sourceTree = "<group>"; };
+		9B341207264842DA00122D3E /* MessageCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MessageCell.m; sourceTree = "<group>"; };
+		9B34120A26495A5A00122D3E /* UserModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UserModel.h; sourceTree = "<group>"; };
+		9B34120B26495A5A00122D3E /* UserModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UserModel.m; sourceTree = "<group>"; };
+		9B34120D26497F7A00122D3E /* WeiboMessageFrame.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WeiboMessageFrame.h; sourceTree = "<group>"; };
+		9B34120E26497F7A00122D3E /* WeiboMessageFrame.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WeiboMessageFrame.m; sourceTree = "<group>"; };
+		9B65028D264781540074D6A0 /* WeiboMessage.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WeiboMessage.h; sourceTree = "<group>"; };
+		9B65028E264781540074D6A0 /* WeiboMessage.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WeiboMessage.m; sourceTree = "<group>"; };
 		9B7D5788263EB4D900E8B2A1 /* xinlangweibo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = xinlangweibo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9B7D578B263EB4D900E8B2A1 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		9B7D578C263EB4D900E8B2A1 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -75,8 +86,6 @@
 		9B7D57EF26453D2C00E8B2A1 /* VisitorViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VisitorViewController.m; sourceTree = "<group>"; };
 		9B7D584426457A2500E8B2A1 /* LoginViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LoginViewController.h; sourceTree = "<group>"; };
 		9B7D584526457A2500E8B2A1 /* LoginViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LoginViewController.m; sourceTree = "<group>"; };
-		9B7D58472646C14E00E8B2A1 /* UserAccount.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UserAccount.h; sourceTree = "<group>"; };
-		9B7D58482646C14E00E8B2A1 /* UserAccount.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UserAccount.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -104,6 +113,69 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		9B34117D264801F100122D3E /* VisitorView */ = {
+			isa = PBXGroup;
+			children = (
+				9B7D57EE26453D2C00E8B2A1 /* VisitorViewController.h */,
+				9B7D57EF26453D2C00E8B2A1 /* VisitorViewController.m */,
+			);
+			path = VisitorView;
+			sourceTree = "<group>";
+		};
+		9B34117E2648020600122D3E /* HomeView */ = {
+			isa = PBXGroup;
+			children = (
+				9B7D57C3263EB70800E8B2A1 /* HomeTableViewController.h */,
+				9B7D57C4263EB70800E8B2A1 /* HomeTableViewController.m */,
+			);
+			path = HomeView;
+			sourceTree = "<group>";
+		};
+		9B34117F2648022100122D3E /* MessageView */ = {
+			isa = PBXGroup;
+			children = (
+				9B7D57C6263EB71300E8B2A1 /* MessageTableViewController.h */,
+				9B7D57C7263EB71300E8B2A1 /* MessageTableViewController.m */,
+			);
+			path = MessageView;
+			sourceTree = "<group>";
+		};
+		9B3411802648022E00122D3E /* LaunchView */ = {
+			isa = PBXGroup;
+			children = (
+				9B7D57D2263EC86900E8B2A1 /* LaunchViewController.h */,
+				9B7D57D3263EC86900E8B2A1 /* LaunchViewController.m */,
+			);
+			path = LaunchView;
+			sourceTree = "<group>";
+		};
+		9B3411812648023900122D3E /* FindView */ = {
+			isa = PBXGroup;
+			children = (
+				9B7D57C9263EB78200E8B2A1 /* FindTableViewController.h */,
+				9B7D57CA263EB78200E8B2A1 /* FindTableViewController.m */,
+			);
+			path = FindView;
+			sourceTree = "<group>";
+		};
+		9B3411822648024800122D3E /* PersonView */ = {
+			isa = PBXGroup;
+			children = (
+				9B7D57CC263EB79100E8B2A1 /* PersonTableViewController.h */,
+				9B7D57CD263EB79100E8B2A1 /* PersonTableViewController.m */,
+			);
+			path = PersonView;
+			sourceTree = "<group>";
+		};
+		9B3411832648025900122D3E /* LoginView */ = {
+			isa = PBXGroup;
+			children = (
+				9B7D584426457A2500E8B2A1 /* LoginViewController.h */,
+				9B7D584526457A2500E8B2A1 /* LoginViewController.m */,
+			);
+			path = LoginView;
+			sourceTree = "<group>";
+		};
 		9B7D577F263EB4D900E8B2A1 = {
 			isa = PBXGroup;
 			children = (
@@ -149,6 +221,8 @@
 		9B7D57C0263EB6BF00E8B2A1 /* VIews */ = {
 			isa = PBXGroup;
 			children = (
+				9B341206264842DA00122D3E /* MessageCell.h */,
+				9B341207264842DA00122D3E /* MessageCell.m */,
 			);
 			path = VIews;
 			sourceTree = "<group>";
@@ -156,20 +230,13 @@
 		9B7D57C1263EB6CB00E8B2A1 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				9B7D57EE26453D2C00E8B2A1 /* VisitorViewController.h */,
-				9B7D57EF26453D2C00E8B2A1 /* VisitorViewController.m */,
-				9B7D57C3263EB70800E8B2A1 /* HomeTableViewController.h */,
-				9B7D57C4263EB70800E8B2A1 /* HomeTableViewController.m */,
-				9B7D57C6263EB71300E8B2A1 /* MessageTableViewController.h */,
-				9B7D57C7263EB71300E8B2A1 /* MessageTableViewController.m */,
-				9B7D57D2263EC86900E8B2A1 /* LaunchViewController.h */,
-				9B7D57D3263EC86900E8B2A1 /* LaunchViewController.m */,
-				9B7D57C9263EB78200E8B2A1 /* FindTableViewController.h */,
-				9B7D57CA263EB78200E8B2A1 /* FindTableViewController.m */,
-				9B7D57CC263EB79100E8B2A1 /* PersonTableViewController.h */,
-				9B7D57CD263EB79100E8B2A1 /* PersonTableViewController.m */,
-				9B7D584426457A2500E8B2A1 /* LoginViewController.h */,
-				9B7D584526457A2500E8B2A1 /* LoginViewController.m */,
+				9B34117D264801F100122D3E /* VisitorView */,
+				9B34117E2648020600122D3E /* HomeView */,
+				9B3411812648023900122D3E /* FindView */,
+				9B34117F2648022100122D3E /* MessageView */,
+				9B3411802648022E00122D3E /* LaunchView */,
+				9B3411822648024800122D3E /* PersonView */,
+				9B3411832648025900122D3E /* LoginView */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -177,10 +244,14 @@
 		9B7D57C2263EB6DA00E8B2A1 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				9B7D58472646C14E00E8B2A1 /* UserAccount.h */,
-				9B7D58482646C14E00E8B2A1 /* UserAccount.m */,
-				9B65028D264781540074D6A0 /* weiboMessage.h */,
-				9B65028E264781540074D6A0 /* weiboMessage.m */,
+				9B65028D264781540074D6A0 /* WeiboMessage.h */,
+				9B65028E264781540074D6A0 /* WeiboMessage.m */,
+				9B34117A2647F65800122D3E /* UserAccount.h */,
+				9B34117B2647F65800122D3E /* Useraccount.m */,
+				9B34120A26495A5A00122D3E /* UserModel.h */,
+				9B34120B26495A5A00122D3E /* UserModel.m */,
+				9B34120D26497F7A00122D3E /* WeiboMessageFrame.h */,
+				9B34120E26497F7A00122D3E /* WeiboMessageFrame.m */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -336,16 +407,19 @@
 			buildActionMask = 2147483647;
 			files = (
 				9B7D57C5263EB70800E8B2A1 /* HomeTableViewController.m in Sources */,
+				9B34120F26497F7A00122D3E /* WeiboMessageFrame.m in Sources */,
 				9B7D578D263EB4D900E8B2A1 /* AppDelegate.m in Sources */,
 				9B7D57F026453D2C00E8B2A1 /* VisitorViewController.m in Sources */,
-				9B7D58492646C14E00E8B2A1 /* UserAccount.m in Sources */,
 				9B7D57D4263EC86900E8B2A1 /* LaunchViewController.m in Sources */,
 				9B7D584626457A2500E8B2A1 /* LoginViewController.m in Sources */,
+				9B341208264842DA00122D3E /* MessageCell.m in Sources */,
 				9B7D579E263EB4DA00E8B2A1 /* main.m in Sources */,
 				9B7D57CE263EB79100E8B2A1 /* PersonTableViewController.m in Sources */,
-				9B65028F264781540074D6A0 /* weiboMessage.m in Sources */,
+				9B65028F264781540074D6A0 /* WeiboMessage.m in Sources */,
 				9B7D5790263EB4D900E8B2A1 /* SceneDelegate.m in Sources */,
 				9B3411792647909200122D3E /* UserAccountTool.m in Sources */,
+				9B34120C26495A5A00122D3E /* UserModel.m in Sources */,
+				9B34117C2647F65800122D3E /* Useraccount.m in Sources */,
 				9B7D57CB263EB78200E8B2A1 /* FindTableViewController.m in Sources */,
 				9B7D57C8263EB71300E8B2A1 /* MessageTableViewController.m in Sources */,
 			);

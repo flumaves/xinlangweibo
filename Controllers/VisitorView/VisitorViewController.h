@@ -9,9 +9,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VisitorViewController : UITableViewController
-
-@property (nonatomic, getter = isLoginIn)BOOL loginIn;
+@interface VisitorViewController : UIViewController
 
 @end
 

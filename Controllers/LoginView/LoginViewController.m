@@ -9,11 +9,13 @@
 #import <WebKit/WebKit.h>
 #import "UserAccount.h"
 #import "UserAccountTool.h"
-#import "weiboMessage.h"
+#import "WeiboMessage.h"
 
 @interface LoginViewController () <WKNavigationDelegate>
 
 @property (nonatomic, strong)WKWebView *loginView;
+
+@property (nonatomic, strong)NSString *access_token;
 
 @end
 
@@ -21,7 +23,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view.
+   
     self.loginView = [[WKWebView alloc] initWithFrame:self.view.frame];
     self.loginView.backgroundColor = [UIColor whiteColor];
     self.loginView.navigationDelegate = self;
@@ -49,16 +51,12 @@
             NSString *code = [query substringFromIndex:5];
             NSLog(@"code----%@",code);
             //获取access_token
-            NSString *access_token = [self getAccessTokenWithCode:code];
-            //加载微博数据
-            [self loadWeiboMessageWithAccess_token:@"2.00fo_5EIAZkRXD3e93d042f0vWOqFE"];
-            
+            _access_token = [self getAccessTokenWithCode:code];
         } else if ([query hasPrefix:@"error"]) {
             //用户取消授权
             NSLog(@"用户取消授权");
             decisionHandler(WKNavigationResponsePolicyCancel);
             [self.navigationController popViewControllerAnimated:YES];
-            
         } else {
             //其他界面
             decisionHandler(WKNavigationResponsePolicyAllow);
@@ -118,37 +116,16 @@
         UserAccount *account = [UserAccount accountWithDictionary:dict];
         //储存账户信息
         [UserAccountTool saveAccount:account];
-        
-//        NSLog(@"%@",account.access_token);
-        
-//        NSLog(@"dict----%@",dict);
-//        NSLog(@"access_token----%@",access_token);
+
+        NSLog(@"%@",account.access_token);
+
+        NSLog(@"dict----%@",dict);
+        NSLog(@"access_token----%@",access_token);
     }];
     //创建的task是停止状态，需要启动
     [task resume];
     
     return access_token;
-}
-
-#pragma mark - 获取微博数据
-- (void)loadWeiboMessageWithAccess_token:(NSString *)access_token {
-    NSString *baseURL = @"https://api.weibo.com/2/statuses/home_timeline.json";
-    NSString *urlString = [NSString stringWithFormat:@"%@?access_token=%@",baseURL ,access_token];
-    NSURL *url = [NSURL URLWithString:urlString];
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
-    
-    NSURLSession *session = [NSURLSession sharedSession];
-    
-    NSURLSessionTask *task = [session dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error)
-    {
-        NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:&error];
-        
-        NSLog(@"dict----%@",dict);
-//        weiboMessage *message = [weiboMessage messageWithDictionary:dict];
-//        NSLog(@"message----%@",message);
-    }];
-    //创建的task是停止状态，需要启动
-    [task resume];
 }
 
 @end

@@ -1,8 +1,8 @@
 //
-//  UserAccount.m
+//  Account.m
 //  xinlangweibo
 //
-//  Created by little_Fking_cute on 2021/5/8.
+//  Created by little_Fking_cute on 2021/5/9.
 //
 
 #import "UserAccount.h"
@@ -46,5 +46,6 @@
     }
     return self;
 }
+
 
 @end
