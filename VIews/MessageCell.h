@@ -8,10 +8,13 @@
 #import <UIKit/UIKit.h>
 #import "WeiboMessageFrame.h"
 
+
 NS_ASSUME_NONNULL_BEGIN
 
 
 @interface MessageCell : UITableViewCell
+
+@property (nonatomic, strong)WeiboMessageFrame *messageFrame;
 
 //加载微博数据
 - (void)loadCellWithMessageFrame:(WeiboMessageFrame *)messageFrame;

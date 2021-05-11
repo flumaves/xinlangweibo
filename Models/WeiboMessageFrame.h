@@ -15,6 +15,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, strong)WeiboMessage *message;
 
+//顶部分割视图
+@property (nonatomic, assign)CGRect topDividView_frame;
+
 //头像的frame
 @property (nonatomic, assign)CGRect user_Img_frame;
 
@@ -25,13 +28,13 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign)CGRect created_at_Lbl_frame;
 
 //点赞数的frame
-@property (nonatomic, assign)CGRect attitudes_count_Lbl_frame;
+@property (nonatomic, assign)CGRect attitudes_count_Btn_frame;
 
 //转发数的frame
-@property (nonatomic, assign)CGRect reposts_count_Lbl_frame;
+@property (nonatomic, assign)CGRect reposts_count_Btn_frame;
 
 //评论数的frame
-@property (nonatomic, assign)CGRect comments_count_Lbl_frame;
+@property (nonatomic, assign)CGRect comments_count_Btn_frame;
 
 //正文的frame
 @property (nonatomic, assign)CGRect text_Lbl_frame;
