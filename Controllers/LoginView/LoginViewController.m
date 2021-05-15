@@ -36,6 +36,7 @@
     [self.view addSubview:_loginView];
 }
 
+#pragma mark - WKWebView的代理方法
 //监听服务器的响应
 - (void)webView:(WKWebView *)webView decidePolicyForNavigationResponse:(WKNavigationResponse *)navigationResponse decisionHandler:(void (^)(WKNavigationResponsePolicy))decisionHandler {
     NSString *host = navigationResponse.response.URL.host;

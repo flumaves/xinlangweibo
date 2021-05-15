@@ -47,6 +47,44 @@
     return data;
 }
 
+
+#pragma mark - 将单个模型转化为data
++ (NSData *)getDataWithMessage:(WeiboMessage *)message {
+    //转成字典储存
+    //用户
+    NSDictionary *userDict = [message.user dictionaryWithValuesForKeys:@[@"screen_name", @"profile_image_url"]];
+    
+    NSDictionary *messageDict = @{
+        @"id"               : message.ID,
+        @"text"             : message.text ? message.text : @"",    //防止传入为nil
+        @"created_at"       : message.created_at,
+        @"source"           : message.source ? message.source : @"",
+        @"user"             : userDict,
+        @"reposts_count"    : message.reposts_count,
+        @"comments_count"   : message.comments_count,
+        @"attitudes_count"  : message.attitudes_count,
+        @"thumbnail_pic"    : message.thumbnail_pic ? message.thumbnail_pic : @"",
+        @"bmiddle_pic"      : message.bmiddle_pic ? message.bmiddle_pic : @"",
+        @"original_pic"     : message.original_pic ? message.original_pic : @"",
+        @"pic_ids"          : message.pic_ids ? message.pic_ids : @""
+    };
+    
+    NSData *data = [NSJSONSerialization dataWithJSONObject:messageDict options:NSJSONWritingPrettyPrinted error:nil];
+    
+    return data;
+}
+
+
+#pragma mark — 将data转化为单个模型
++ (WeiboMessage *)messageWithData:(NSData *)data {
+    NSDictionary *messageDict = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableLeaves error:nil];
+    
+    WeiboMessage *message = [WeiboMessage messageWithDictionary:messageDict];
+    
+    return message;
+}
+
+
 #pragma mark - 将data转化为模型数组
 + (NSMutableArray *)messageArrayWithData:(NSData *)data {
     NSMutableArray *messageArray = [NSMutableArray array];
@@ -65,6 +103,7 @@
     }
     return messageArray;
 }
+
 
 #pragma mark - 历史记录
 //储存历史记录

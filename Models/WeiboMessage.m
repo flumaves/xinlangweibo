@@ -38,7 +38,7 @@
     return [NSString stringWithFormat:@"\n \ntext:%@ \nsource:%@ \ncreated_at:%@ \nreposts_count:%@ \n attitudes_count:%@ \n comments_count:%@ \nuser:%@ \nthumbnail_pic: %@ \nbmiddle_pic:%@ \noriginal_pic:%@ \npic_ids:%@", _text, _source, _created_at, _reposts_count, _attitudes_count, _comments_count, _user, _thumbnail_pic, _bmiddle_pic, _original_pic, _pic_ids];
 }
 
-//从text中截取正文
+#pragma mark - 从传来的originText中截取正文
 - (NSString *)getSubText {
     NSString *text = [NSString string];
     if ([_text containsString:@"http"]) {    //判断text中是否拥有路径
@@ -56,7 +56,7 @@
     return text;
 }
 
-//从text中截取网页的URL
+#pragma mark - 从text中截取网页的URL
 - (NSString *)getOriginalUrl {
     NSString *url_0 = [NSString string];
     if ([_text containsString:@"http"]) {    //判断text中是否拥有路径
@@ -79,7 +79,7 @@
     return url_0;
 }
 
-//正文的富文本
+#pragma mark //正文的富文本
 - (NSAttributedString *)setAttributedString {
     NSString *text = [self getSubText]; //截取正文
     
