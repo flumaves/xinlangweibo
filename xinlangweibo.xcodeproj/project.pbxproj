@@ -26,6 +26,9 @@
 		9B7D57D4263EC86900E8B2A1 /* LaunchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B7D57D3263EC86900E8B2A1 /* LaunchViewController.m */; };
 		9B7D57F026453D2C00E8B2A1 /* VisitorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B7D57EF26453D2C00E8B2A1 /* VisitorViewController.m */; };
 		9B7D584626457A2500E8B2A1 /* LoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B7D584526457A2500E8B2A1 /* LoginViewController.m */; };
+		9BF534E7264C27120044F3E7 /* WebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BF534E6264C27120044F3E7 /* WebViewController.m */; };
+		9BF5356D264D3F910044F3E7 /* StatusTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BF5356C264D3F910044F3E7 /* StatusTableViewController.m */; };
+		9BF53570264D73FB0044F3E7 /* MessageTool.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BF5356F264D73FB0044F3E7 /* MessageTool.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -86,6 +89,12 @@
 		9B7D57EF26453D2C00E8B2A1 /* VisitorViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VisitorViewController.m; sourceTree = "<group>"; };
 		9B7D584426457A2500E8B2A1 /* LoginViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LoginViewController.h; sourceTree = "<group>"; };
 		9B7D584526457A2500E8B2A1 /* LoginViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LoginViewController.m; sourceTree = "<group>"; };
+		9BF534E5264C27120044F3E7 /* WebViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WebViewController.h; sourceTree = "<group>"; };
+		9BF534E6264C27120044F3E7 /* WebViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WebViewController.m; sourceTree = "<group>"; };
+		9BF5356B264D3F910044F3E7 /* StatusTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StatusTableViewController.h; sourceTree = "<group>"; };
+		9BF5356C264D3F910044F3E7 /* StatusTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = StatusTableViewController.m; sourceTree = "<group>"; };
+		9BF5356E264D73FB0044F3E7 /* MessageTool.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MessageTool.h; sourceTree = "<group>"; };
+		9BF5356F264D73FB0044F3E7 /* MessageTool.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MessageTool.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -180,8 +189,8 @@
 			isa = PBXGroup;
 			children = (
 				9B7D58352645736200E8B2A1 /* Tools */,
-				9B7D57F32645438D00E8B2A1 /* xinlangweibo */,
 				9B7D57C2263EB6DA00E8B2A1 /* Models */,
+				9B7D57F32645438D00E8B2A1 /* xinlangweibo */,
 				9B7D57C0263EB6BF00E8B2A1 /* VIews */,
 				9B7D57C1263EB6CB00E8B2A1 /* Controllers */,
 				9B7D57A6263EB4DA00E8B2A1 /* xinlangweiboTests */,
@@ -230,6 +239,8 @@
 		9B7D57C1263EB6CB00E8B2A1 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				9BF5356A264D3F1B0044F3E7 /* StatusView */,
+				9BF534E4264C26EF0044F3E7 /* WebVIew */,
 				9B34117D264801F100122D3E /* VisitorView */,
 				9B34117E2648020600122D3E /* HomeView */,
 				9B3411812648023900122D3E /* FindView */,
@@ -275,8 +286,28 @@
 			children = (
 				9B3411772647909200122D3E /* UserAccountTool.h */,
 				9B3411782647909200122D3E /* UserAccountTool.m */,
+				9BF5356E264D73FB0044F3E7 /* MessageTool.h */,
+				9BF5356F264D73FB0044F3E7 /* MessageTool.m */,
 			);
 			path = Tools;
+			sourceTree = "<group>";
+		};
+		9BF534E4264C26EF0044F3E7 /* WebVIew */ = {
+			isa = PBXGroup;
+			children = (
+				9BF534E5264C27120044F3E7 /* WebViewController.h */,
+				9BF534E6264C27120044F3E7 /* WebViewController.m */,
+			);
+			path = WebVIew;
+			sourceTree = "<group>";
+		};
+		9BF5356A264D3F1B0044F3E7 /* StatusView */ = {
+			isa = PBXGroup;
+			children = (
+				9BF5356B264D3F910044F3E7 /* StatusTableViewController.h */,
+				9BF5356C264D3F910044F3E7 /* StatusTableViewController.m */,
+			);
+			path = StatusView;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -411,9 +442,11 @@
 				9B7D578D263EB4D900E8B2A1 /* AppDelegate.m in Sources */,
 				9B7D57F026453D2C00E8B2A1 /* VisitorViewController.m in Sources */,
 				9B7D57D4263EC86900E8B2A1 /* LaunchViewController.m in Sources */,
+				9BF5356D264D3F910044F3E7 /* StatusTableViewController.m in Sources */,
 				9B7D584626457A2500E8B2A1 /* LoginViewController.m in Sources */,
 				9B341208264842DA00122D3E /* MessageCell.m in Sources */,
 				9B7D579E263EB4DA00E8B2A1 /* main.m in Sources */,
+				9BF534E7264C27120044F3E7 /* WebViewController.m in Sources */,
 				9B7D57CE263EB79100E8B2A1 /* PersonTableViewController.m in Sources */,
 				9B65028F264781540074D6A0 /* WeiboMessage.m in Sources */,
 				9B7D5790263EB4D900E8B2A1 /* SceneDelegate.m in Sources */,
@@ -421,6 +454,7 @@
 				9B34120C26495A5A00122D3E /* UserModel.m in Sources */,
 				9B34117C2647F65800122D3E /* Useraccount.m in Sources */,
 				9B7D57CB263EB78200E8B2A1 /* FindTableViewController.m in Sources */,
+				9BF53570264D73FB0044F3E7 /* MessageTool.m in Sources */,
 				9B7D57C8263EB71300E8B2A1 /* MessageTableViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

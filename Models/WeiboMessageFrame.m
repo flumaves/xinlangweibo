@@ -7,7 +7,8 @@
 
 #import "WeiboMessageFrame.h"
 
-#define TEXTFONT [UIFont systemFontOfSize:14]
+#define TEXTFONT [UIFont systemFontOfSize:17]
+//#define TEXTKERN
 
 @implementation WeiboMessageFrame
 
@@ -50,17 +51,39 @@
     
     //正文
     CGFloat textX = magin;
-    CGFloat textY = CGRectGetMaxY(_created_at_Lbl_frame);
+    CGFloat textY = CGRectGetMaxY(_created_at_Lbl_frame) + magin;
     
         //计算text的行高
-    NSString *text = _message.text;
-    CGSize textSize = [text boundingRectWithSize:CGSizeMake([UIScreen mainScreen].bounds.size.width - 2 * magin, 300) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName: TEXTFONT} context:nil].size;
-    _text_Lbl_frame = CGRectMake(textX, textY, textSize.width, textSize.height);
+    NSString *text = _message.subText;
+    
+    CGSize textSize = [text boundingRectWithSize:CGSizeMake([UIScreen mainScreen].bounds.size.width - 2 * magin, [UIScreen mainScreen].bounds.size.height * 10) options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName: TEXTFONT} context:nil].size;
+ 
+    _text_View_frame = CGRectMake(textX, textY, textSize.width, textSize.height + 21);
+    //预留一行的空间
+    
+    //缩略图
+    if (_message.thumbnail_pic.length > 0) {
+        NSString *urlString = _message.original_pic;    //获取图片
+        NSURL *url = [NSURL URLWithString:urlString];
+        NSData *imgData = [NSData dataWithContentsOfURL:url];
+        UIImage *img = [UIImage imageWithData:imgData];
+        
+        CGFloat thumbnailImgW = 300;
+        CGFloat thumbnailImgH  =300 * img.size.height / img.size.width; //比例缩放图片
+        CGFloat thumbnailImgX = magin;
+        CGFloat thumbnailImgY = CGRectGetMaxY(_text_View_frame) + magin;
+        _thumbnail_pic_frame = CGRectMake(thumbnailImgX, thumbnailImgY, thumbnailImgW, thumbnailImgH);
+    }
     
     //底下三个控件统一宽度    高度  Y
     CGFloat lblW = [UIScreen mainScreen].bounds.size.width / 3;
     CGFloat lblH = 30;
-    CGFloat lblY = CGRectGetMaxY(_text_Lbl_frame) + magin;
+    CGFloat lblY;
+    if (_message.thumbnail_pic.length > 0) {
+        lblY = CGRectGetMaxY(_thumbnail_pic_frame) +magin;
+    } else {
+        lblY = CGRectGetMaxY(_text_View_frame);
+    }
     
     //点赞数
     CGFloat attitudeLblX = 0 * lblW;
@@ -74,9 +97,7 @@
     //评论数
     CGFloat commentX = 2 * lblW;
     _comments_count_Btn_frame = CGRectMake(commentX, lblY, lblW, lblH);
-
-    _rowHeight = CGRectGetMaxY(_comments_count_Btn_frame);
     
+    _rowHeight = CGRectGetMaxY(_attitudes_count_Btn_frame);
 }
-
 @end

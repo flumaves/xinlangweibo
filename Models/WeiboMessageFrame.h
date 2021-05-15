@@ -27,6 +27,12 @@ NS_ASSUME_NONNULL_BEGIN
 //发布时间的frame
 @property (nonatomic, assign)CGRect created_at_Lbl_frame;
 
+//正文的frame
+@property (nonatomic, assign)CGRect text_View_frame;
+
+//缩略配图的frame
+@property (nonatomic, assign)CGRect thumbnail_pic_frame;
+
 //点赞数的frame
 @property (nonatomic, assign)CGRect attitudes_count_Btn_frame;
 
@@ -36,11 +42,9 @@ NS_ASSUME_NONNULL_BEGIN
 //评论数的frame
 @property (nonatomic, assign)CGRect comments_count_Btn_frame;
 
-//正文的frame
-@property (nonatomic, assign)CGRect text_Lbl_frame;
-
 //cell的高度
 @property (nonatomic, assign)CGFloat rowHeight;
+
 @end
 
 NS_ASSUME_NONNULL_END

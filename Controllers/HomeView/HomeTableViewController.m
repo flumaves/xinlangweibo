@@ -7,12 +7,13 @@
 
 
 #import "HomeTableViewController.h"
-#import "WeiboMessage.h"
 #import "WeiboMessageFrame.h"
 #import "MessageCell.h"
+#import "WebViewController.h"
 
-@interface HomeTableViewController ()
+@interface HomeTableViewController () <MessageCellDelegate>
 
+//微博模型数组，frame模型中包含对应的微博数据
 @property (nonatomic, strong)NSMutableArray *messageFrameArray;
 
 @end
@@ -30,7 +31,7 @@
 
 - (NSMutableArray *)messageFrameArray {
     if (_messageFrameArray == nil) {
-        _messageFrameArray = [self loadWeiboMessageWithAccess_token:@"2.00fo_5EI0q9TVv48692e6e8aG3rlbC"];
+        _messageFrameArray = [self loadWeiboMessageWithAccess_token:@"2.00fo_5EIAZkRXD3e93d042f0vWOqFE"];
     }
     return _messageFrameArray;
 }
@@ -65,21 +66,17 @@
         for (NSDictionary *dictionary in dictArray) {
             //微博数据
             WeiboMessage *message = [WeiboMessage messageWithDictionary:dictionary];
-            NSLog(@"%@",message);
             //frame模型
             WeiboMessageFrame *messageFrame = [[WeiboMessageFrame alloc] init];
             messageFrame.message = message;
             //frame模型数组
             [messageFrameArray addObject:messageFrame];
-            
-            NSLog(@"message____%@",message);
-//
 //            dispatch_semaphore_signal(semaphore);
         }
 //
         self.messageFrameArray = messageFrameArray;
-//
-//        dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+//          dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+        NSLog(@"网络请求完毕");
     }];
     //创建的task是停止状态，需要启动
     [task resume];
@@ -102,6 +99,19 @@
     } else return 200;
 }
 
+//cell被点击 ()
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    //获取当前点击的message数据
+    WeiboMessageFrame *messageFrame = self.messageFrameArray[indexPath.section];
+    WeiboMessage *message = messageFrame.message;
+    
+    if ([self.delegate respondsToSelector:@selector(addHistoryMessageArrayWithMessage:)]) {
+        [self.delegate addHistoryMessageArrayWithMessage:message];
+    }
+    
+}
+
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     WeiboMessageFrame *messageFrame = _messageFrameArray[indexPath.section];
     
@@ -113,6 +123,7 @@
         cell = [[MessageCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:ID];
         //选中时不改变状态
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
+        cell.delegate = self;
     }
     
     [cell loadCellWithMessageFrame:messageFrame];
@@ -120,10 +131,20 @@
     return cell;
 }
 
+
+//右上角点击刷新按钮
 - (void)loadNewMessages {
-    
-//    [self loadWeiboMessageWithAccess_token:@"2.00fo_5EIAZkRXD3e93d042f0vWOqFE"];
+    [self loadWeiboMessageWithAccess_token:@"2.00fo_5EIAZkRXD3e93d042f0vWOqFE"];
     [self.tableView reloadData];
 }
 
+
+#pragma mark - cell的delegate
+- (void)openUrl:(NSURL *)URL {
+    WebViewController *webViewController = [[WebViewController alloc] init];
+    
+    [self.navigationController pushViewController:webViewController animated:YES];
+    
+    [webViewController loadWebViewWithUrl:URL];
+}
 @end

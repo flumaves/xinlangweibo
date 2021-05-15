@@ -11,10 +11,18 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@protocol MessageCellDelegate <NSObject>
+
+- (void)openUrl:(NSURL *)URL;
+
+@end
 
 @interface MessageCell : UITableViewCell
-
+//frame模型
 @property (nonatomic, strong)WeiboMessageFrame *messageFrame;
+
+//delegate
+@property (nonatomic, weak)id<MessageCellDelegate> delegate;
 
 //加载微博数据
 - (void)loadCellWithMessageFrame:(WeiboMessageFrame *)messageFrame;

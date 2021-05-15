@@ -6,8 +6,20 @@
 //
 
 #import "PersonTableViewController.h"
+#import "StatusTableViewController.h"
+#import "HomeTableViewController.h"
+#import "MessageTool.h"
 
-@interface PersonTableViewController ()
+@interface PersonTableViewController () <HomeTableViewControllerDelegate>
+
+//浏览过的微博的数组
+@property (nonatomic, strong)NSMutableArray *historyStatusArray;
+
+//收藏的微博的数组
+@property (nonatomic, strong)NSMutableArray *likeStatusArray;
+
+//发布的微博的数组
+@property (nonatomic, strong)NSMutableArray *launchStatusArray;
 
 @end
 
@@ -16,75 +28,113 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    // Uncomment the following line to preserve selection between presentations.
-    // self.clearsSelectionOnViewWillAppear = NO;
+    UITableView *tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStyleGrouped];
     
-    // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-    // self.navigationItem.rightBarButtonItem = self.editButtonItem;
+    self.tableView = tableView;
 }
 
 #pragma mark - Table view data source
-
+//静态单元格
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 0;
+    return 2;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    switch (section) {
+        case 0:
+            return 1;
+        case 1:
+            return 2;
+        default:
+            break;
+    }
     return 0;
 }
 
-/*
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:<#@"reuseIdentifier"#> forIndexPath:indexPath];
-    
-    // Configure the cell...
-    
+    UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:nil];
+    switch (indexPath.section) {
+        case 0:
+            cell.textLabel.text = @"浏览历史";
+            cell.imageView.image = [UIImage imageNamed:@"history"];
+            cell.tag = 0;
+            break;
+        case 1:
+            if (indexPath.row == 0) {
+                cell.textLabel.text = @"我的收藏";
+                cell.imageView.image = [UIImage imageNamed:@"like"];
+                cell.tag = 1;
+            } else if (indexPath.row == 1) {
+                cell.textLabel.text = @"我的发表";
+                cell.imageView.image = [UIImage imageNamed:@"launch"];
+                cell.tag = 2;
+            }
+            break;
+        default:
+            break;
+    }
     return cell;
 }
-*/
 
-/*
-// Override to support conditional editing of the table view.
-- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return NO if you do not want the specified item to be editable.
-    return YES;
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    UITableViewCell *cell = (UITableViewCell *) [tableView cellForRowAtIndexPath:indexPath];
+    
+    StatusTableViewController *statusViewController = [[StatusTableViewController alloc] init];
+    statusViewController.tag = cell.tag;
+    
+    [self.navigationController pushViewController:statusViewController animated:YES];
 }
-*/
 
-/*
-// Override to support editing the table view.
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
-        // Delete the row from the data source
-        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-    } else if (editingStyle == UITableViewCellEditingStyleInsert) {
-        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-    }   
+
+//懒加载
+//浏览历史
+- (NSMutableArray *)historyStatusArray {
+    if (_historyStatusArray == nil) {
+        _historyStatusArray = [MessageTool historyMessageArray];
+    }
+    if (_historyStatusArray == nil) {
+        //解档后为nil 说明没有浏览历史
+        _historyStatusArray = [NSMutableArray array];
+    }
+    return _historyStatusArray;
 }
-*/
-
-/*
-// Override to support rearranging the table view.
-- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath {
+//我的发表
+- (NSMutableArray *)launchStatusArray {
+    if (_launchStatusArray == nil) {
+        _launchStatusArray = [MessageTool launchMessageArray];
+    }
+    if (_launchStatusArray == nil) {
+        //解档后为nil 说明没有发表微博
+        _launchStatusArray = [NSMutableArray array];
+    }
+    return _launchStatusArray;
 }
-*/
-
-/*
-// Override to support conditional rearranging of the table view.
-- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return NO if you do not want the item to be re-orderable.
-    return YES;
+//我的收藏
+- (NSMutableArray *)likeStatusArray {
+    if (_likeStatusArray == nil) {
+        _likeStatusArray = [MessageTool likeMessageArray];
+    }
+    if (_likeStatusArray == nil) {
+        //解档后为nil 说明没有收藏
+        _likeStatusArray = [NSMutableArray array];
+    }
+    return _likeStatusArray;
 }
-*/
 
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
+#pragma mark - HomeTableViewController delegate
+- (void)addHistoryMessageArrayWithMessage:(WeiboMessage *)message {
+    BOOL haveASameMessage = NO;
+    NSArray *array = [NSArray arrayWithArray:self.historyStatusArray];
+    for (WeiboMessage *status in array) {
+        if ([status.ID isEqual:message.ID]) {         //已经浏览过的weibo
+            haveASameMessage = YES;
+            NSInteger index = [array indexOfObject:status];   //把微博删除
+            [_historyStatusArray removeObjectAtIndex:index];
+        }
+    }
+    
+    [self.historyStatusArray insertObject:message atIndex:0];   //插入到数组头部 使最新的浏览记录在最前面
+    [MessageTool saveHistoryMessage:self.historyStatusArray];
 }
-*/
 
 @end
