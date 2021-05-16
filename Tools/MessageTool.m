@@ -36,7 +36,8 @@
             @"thumbnail_pic"    : message.thumbnail_pic ? message.thumbnail_pic : @"",
             @"bmiddle_pic"      : message.bmiddle_pic ? message.bmiddle_pic : @"",
             @"original_pic"     : message.original_pic ? message.original_pic : @"",
-            @"pic_ids"          : message.pic_ids ? message.pic_ids : @""
+            @"pic_ids"          : message.pic_ids ? message.pic_ids : @"",
+            @"likeMessage"      : message.likeMessage
         };
         
         [array addObject:messageDict];
@@ -66,7 +67,8 @@
         @"thumbnail_pic"    : message.thumbnail_pic ? message.thumbnail_pic : @"",
         @"bmiddle_pic"      : message.bmiddle_pic ? message.bmiddle_pic : @"",
         @"original_pic"     : message.original_pic ? message.original_pic : @"",
-        @"pic_ids"          : message.pic_ids ? message.pic_ids : @""
+        @"pic_ids"          : message.pic_ids ? message.pic_ids : @"",
+        @"likeMessage"      : message.likeMessage
     };
     
     NSData *data = [NSJSONSerialization dataWithJSONObject:messageDict options:NSJSONWritingPrettyPrinted error:nil];
@@ -97,9 +99,6 @@
             WeiboMessage *message = [WeiboMessage messageWithDictionary:dict];
             [messageArray addObject:message];
         }
-    
-        NSLog(@"解档_浏览历史");
-        NSLog(@"%@",HISTORYPATH);
     }
     return messageArray;
 }
@@ -114,6 +113,7 @@
     [data writeToFile:HISTORYPATH atomically:YES];
     
     NSLog(@"归档_浏览历史");
+    NSLog(@"%@",HISTORYPATH);
 }
 
 //读取浏览历史
@@ -122,6 +122,8 @@
     NSData *data = [NSData dataWithContentsOfFile:HISTORYPATH];
     //转为数组
     NSMutableArray *historyMessageArray = [MessageTool messageArrayWithData:data];
+    
+    NSLog(@"解档_浏览历史");
     
     return historyMessageArray;
 }
@@ -136,6 +138,7 @@
     [data writeToFile:LAUNCHPATH atomically:YES];
     
     NSLog(@"归档_我的发表");
+    NSLog(@"%@",LAUNCHPATH);
 }
 
 //读取我的发表
@@ -157,6 +160,7 @@
     [data writeToFile:LIKEPATH atomically:YES];
     
     NSLog(@"归档_我的收藏");
+    NSLog(@"%@",LIKEPATH);
 }
 
 //读取我的收藏
@@ -164,6 +168,7 @@
     NSData *data = [NSData dataWithContentsOfFile:LIKEPATH];
     
     NSMutableArray *likeMessageArray = [MessageTool messageArrayWithData:data];
+    
     
     NSLog(@"解档_我的收藏");
     return likeMessageArray;

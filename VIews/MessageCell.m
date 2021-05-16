@@ -8,6 +8,8 @@
 #import "MessageCell.h"
 
 @interface MessageCell () <UITextViewDelegate>
+//是否为收藏的微博
+@property (nonatomic, strong)NSString *likeMessage;
 
 //顶部分割视图
 @property (nonatomic, strong)UIView *topDividView;
@@ -78,6 +80,11 @@
         _comments_count_Btn = [[UIButton alloc] init];
         [_comments_count_Btn setImage: [UIImage imageNamed:@"pinglun"] forState:UIControlStateNormal];
         [self.contentView addSubview:_comments_count_Btn];
+        
+        //点赞按钮
+        _like_Btn = [[UIButton alloc] init];
+        [_like_Btn addTarget:self action:@selector(likeMessage:) forControlEvents:UIControlEventTouchUpInside];
+        [self.contentView addSubview:_like_Btn];
 
         //正文
         _text_View = [[UITextView alloc] init];
@@ -89,6 +96,8 @@
 
         //缩略图
         _thumbnail_pic = [[UIImageView alloc] init];
+//        _thumbnail_pic.contentMode = UIViewContentModeScaleAspectFill;
+//        _thumbnail_pic.clipsToBounds = YES;
         [self.contentView addSubview:_thumbnail_pic];
     }
     return self;
@@ -113,7 +122,7 @@
 
     //发布时间
     _created_at_Lbl.frame = messageFrame.created_at_Lbl_frame;
-    _created_at_Lbl.text = messageFrame.message.created_at;
+    _created_at_Lbl.text = [self messureTheTime];
 
     //正文
     _text_View.frame = messageFrame.text_View_frame;
@@ -135,6 +144,15 @@
     [_comments_count_Btn setTitle: [messageFrame.message.comments_count stringValue] forState:UIControlStateNormal];
     [_comments_count_Btn setTitleColor: [UIColor grayColor] forState: UIControlStateNormal];
     
+    //收藏按钮
+    _like_Btn.frame = messageFrame.like_Btn_frame;
+    self.likeMessage = messageFrame.message.likeMessage;
+    if ([self.likeMessage isEqual:@"NO"]) {
+        [_like_Btn setImage: [UIImage imageNamed:@"unlike"] forState:UIControlStateNormal];
+    } else {
+        [_like_Btn setImage: [UIImage imageNamed:@"like"] forState:UIControlStateNormal];
+    }
+    
     //缩略图
     _thumbnail_pic.frame = messageFrame.thumbnail_pic_frame;
     if (messageFrame.message.thumbnail_pic == NULL) {
@@ -145,6 +163,7 @@
     }
 }
 
+
 //通过url获取图片
 - (UIImage *)getImgWithUrlString:(NSString *)urlString {
     NSURL *url = [NSURL URLWithString:urlString];
@@ -154,6 +173,65 @@
     UIImage *img = [UIImage imageWithData:imgData];
     
     return img;
+}
+
+//点击收藏按钮
+- (void)likeMessage:(WeiboMessage *)message {
+    if ([self.likeMessage isEqual:@"YES"]) {     //取消收藏
+        _likeMessage = @"NO";
+        _messageFrame.message.likeMessage = @"NO";
+        [_like_Btn setImage: [UIImage imageNamed:@"unlike"] forState:UIControlStateNormal];
+        if ([self.delegate respondsToSelector:@selector(deleteLikeMessageWithMessage:)]) {  //从收藏的数据中删除
+            [self.delegate deleteLikeMessageWithMessage:self.messageFrame.message];
+        }
+    } else {                                     //收藏
+        _likeMessage = @"YES";
+        _messageFrame.message.likeMessage = @"YES";
+        [_like_Btn setImage: [UIImage imageNamed:@"like"] forState:UIControlStateNormal];
+        if ([self.delegate respondsToSelector:@selector(addLikeMessageWithMessage:)]) {
+            [self.delegate addLikeMessageWithMessage:self.messageFrame.message];
+            //添加微博到收藏的数据中
+        }
+    }
+}
+
+//转化成几分钟前的格式
+- (NSString *)messureTheTime {
+    //获取发布时间的时间戳
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    dateFormatter.dateFormat = @"EEE MMM dd HH:mm:ss +0800 yyyy";
+    
+    NSDate *date = [dateFormatter dateFromString:self.messageFrame.message.created_at];
+    NSTimeInterval creatTime = [date timeIntervalSince1970];
+    
+    //获取当前的时间戳
+    NSTimeInterval currentTime = [[NSDate date] timeIntervalSince1970];
+    
+    //时间差
+    NSTimeInterval time = currentTime - creatTime;
+    
+    NSInteger sec = time / 60;
+    if (sec < 60) {
+        return [NSString stringWithFormat:@"%ld分钟前",sec];
+    }
+    //秒转小时
+    NSInteger hour = sec / 60;
+    if (hour < 24) {
+        return [NSString stringWithFormat:@"%ld小时前",hour];
+    }
+    //小时转天数
+    NSInteger day = hour / 24;
+    if (day < 30) {
+        return [NSString stringWithFormat:@"%ld天前",day];
+    }
+    //天数转月
+    NSInteger month = day / 30;
+    if (month < 12) {
+        return [NSString stringWithFormat:@"%ld月前",month];
+    }
+    //月转年
+    NSInteger year = month / 12;
+    return [NSString stringWithFormat:@"%ld年前",year];
 }
 
 #pragma mark - textView代理方法

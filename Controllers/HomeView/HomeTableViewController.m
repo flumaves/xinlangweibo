@@ -10,11 +10,17 @@
 #import "WeiboMessageFrame.h"
 #import "MessageCell.h"
 #import "WebViewController.h"
+#import "MessageTool.h"
+#import "UserAccountTool.h"
+#import "UserAccount.h"
 
 @interface HomeTableViewController () <MessageCellDelegate>
 
 //微博模型数组，frame模型中包含对应的微博数据
 @property (nonatomic, strong)NSMutableArray *messageFrameArray;
+
+//收藏的微博数组
+@property (nonatomic, strong)NSMutableArray *likeMessageArray;
 
 @end
 
@@ -22,6 +28,8 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    _messageFrameArray = [self messageFrameArray];
+    
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
     
@@ -29,11 +37,23 @@
     self.navigationItem.rightBarButtonItem.tintColor = [UIColor orangeColor];
 }
 
+#pragma mark - 数据的懒加载
+//加载到tableView上的数据
 - (NSMutableArray *)messageFrameArray {
     if (_messageFrameArray == nil) {
-        _messageFrameArray = [self loadWeiboMessageWithAccess_token:@"2.00fo_5EIAZkRXD3e93d042f0vWOqFE"];
+        UserAccount *account = [UserAccountTool account];
+        _messageFrameArray = [self loadWeiboMessageWithAccess_token:account.access_token];
     }
     return _messageFrameArray;
+}
+
+//收藏的微博
+//用于判断加载的微博中是否拥有已经收藏的微博
+- (NSMutableArray *)likeMessageArray {
+    if (_likeMessageArray == nil) {
+        _likeMessageArray = [MessageTool likeMessageArray];
+    }
+    return _likeMessageArray;
 }
    
 
@@ -66,17 +86,27 @@
         for (NSDictionary *dictionary in dictArray) {
             //微博数据
             WeiboMessage *message = [WeiboMessage messageWithDictionary:dictionary];
-            //frame模型
+            //遍历看有无已经收藏了的微博
+            for (WeiboMessage *likeMessage in self.likeMessageArray) {
+                if (likeMessage.ID == message.ID) { //同一条微博
+                    message.likeMessage = likeMessage.likeMessage;
+                }
+            }
+            
+            //封装成frame模型
             WeiboMessageFrame *messageFrame = [[WeiboMessageFrame alloc] init];
             messageFrame.message = message;
             //frame模型数组
             [messageFrameArray addObject:messageFrame];
 //            dispatch_semaphore_signal(semaphore);
         }
-//
+        //添加自己发布的最新的一条微博
+        NSMutableArray *launchMessageArray = [MessageTool launchMessageArray];
+        WeiboMessage *launchMessage = [launchMessageArray objectAtIndex:0];
+        [messageFrameArray insertObject:launchMessage atIndex:0];
+        
         self.messageFrameArray = messageFrameArray;
 //          dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
-        NSLog(@"网络请求完毕");
     }];
     //创建的task是停止状态，需要启动
     [task resume];
@@ -140,6 +170,7 @@
 
 
 #pragma mark - cell的delegate
+//打开文字链接的网址
 - (void)openUrl:(NSURL *)URL {
     WebViewController *webViewController = [[WebViewController alloc] init];
     
@@ -147,4 +178,27 @@
     
     [webViewController loadWebViewWithUrl:URL];
 }
+
+//添加微博到收藏
+- (void)addLikeMessageWithMessage:(WeiboMessage *)message {
+    [self.likeMessageArray insertObject:message atIndex:0]; //使最新收藏的微博显示在最上面
+    
+    [MessageTool saveLikeMessage:_likeMessageArray];
+    //同时计入浏览记录
+    if ([self.delegate respondsToSelector:@selector(addHistoryMessageArrayWithMessage:)]) {
+        [self.delegate addHistoryMessageArrayWithMessage:message];
+    }
+}
+
+//删除收藏的微博
+- (void)deleteLikeMessageWithMessage:(WeiboMessage *)message {
+    [self.likeMessageArray removeObject:message];
+    
+    [MessageTool saveLikeMessage:_likeMessageArray];
+    //同时计入浏览记录
+    if ([self.delegate respondsToSelector:@selector(addHistoryMessageArrayWithMessage:)]) {
+        [self.delegate addHistoryMessageArrayWithMessage:message];
+    }
+}
+
 @end

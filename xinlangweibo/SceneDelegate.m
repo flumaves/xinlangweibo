@@ -59,7 +59,7 @@
     //判断是否本地已经存在账户
     UserAccount *account = [UserAccountTool account];
     
-    if (account) {      //如果已有账户存在 直接加载界面
+    if (account.access_token.length > 0) {      //如果已有账户存在 直接加载界面
         UITabBarController *tabBar = [[UITabBarController alloc] init];
         //图片的渲染颜色
         tabBar.tabBar.tintColor = [UIColor orangeColor];

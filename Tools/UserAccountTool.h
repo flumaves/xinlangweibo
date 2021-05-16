@@ -17,6 +17,9 @@ NS_ASSUME_NONNULL_BEGIN
 //读取账号信息
 + (UserAccount *)account;
 
+//nsdata转为account
++ (UserAccount *)accountWithData:(NSData *)data;
+
 @end
 
 NS_ASSUME_NONNULL_END

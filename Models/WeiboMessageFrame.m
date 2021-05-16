@@ -58,8 +58,7 @@
     
     CGSize textSize = [text boundingRectWithSize:CGSizeMake([UIScreen mainScreen].bounds.size.width - 2 * magin, [UIScreen mainScreen].bounds.size.height * 10) options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName: TEXTFONT} context:nil].size;
  
-    _text_View_frame = CGRectMake(textX, textY, textSize.width, textSize.height + 21);
-    //预留一行的空间
+    _text_View_frame = CGRectMake(textX, textY, textSize.width + 3, textSize.height + 21);  //预留一行的空间
     
     //缩略图
     if (_message.thumbnail_pic.length > 0) {
@@ -76,7 +75,7 @@
     }
     
     //底下三个控件统一宽度    高度  Y
-    CGFloat lblW = [UIScreen mainScreen].bounds.size.width / 3;
+    CGFloat lblW = [UIScreen mainScreen].bounds.size.width / 4;
     CGFloat lblH = 30;
     CGFloat lblY;
     if (_message.thumbnail_pic.length > 0) {
@@ -97,6 +96,10 @@
     //评论数
     CGFloat commentX = 2 * lblW;
     _comments_count_Btn_frame = CGRectMake(commentX, lblY, lblW, lblH);
+    
+    //收藏按钮
+    CGFloat likeX = 3 * lblW;
+    _like_Btn_frame = CGRectMake(likeX, lblY, lblW, lblH);
     
     _rowHeight = CGRectGetMaxY(_attitudes_count_Btn_frame);
 }

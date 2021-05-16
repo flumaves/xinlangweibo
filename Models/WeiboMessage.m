@@ -26,6 +26,7 @@
         self.url             = [self getOriginalUrl];
         self.subText         = [self getSubText];
         self.attr            = [self setAttributedString];
+        self.likeMessage     = dictionary[@"likeMessage"] ? dictionary[@"likeMessage"] : @"NO";  //网络请求的cell 传入的dictionar中没有likeMessage 则设置成@"NO"
     }
     return self;
 }
@@ -52,6 +53,8 @@
         } else {
             text = subString_0;
         }
+    } else {
+        text = _text;
     }
     return text;
 }

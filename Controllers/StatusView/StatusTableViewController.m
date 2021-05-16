@@ -7,7 +7,6 @@
 
 #import "StatusTableViewController.h"
 #import "WebViewController.h"
-#import "WeiboMessage.h"
 #import "WeiboMessageFrame.h"
 #import "MessageCell.h"
 #import "MessageTool.h"
@@ -19,6 +18,9 @@
 //需要加载的微博数组
 @property (nonatomic, strong)NSMutableArray *statusArray;
 
+//收藏的微博数组
+@property (nonatomic, strong)NSMutableArray *likeMessageArray;
+
 
 @end
 
@@ -26,6 +28,18 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    self.tableView.tableFooterView = [UIView new];
+}
+
+
+//收藏的微博
+//用于判断加载的微博中是否拥有已经收藏的微博
+- (NSMutableArray *)likeMessageArray {
+    if (_likeMessageArray == nil) {
+        _likeMessageArray = [MessageTool likeMessageArray];
+    }
+    return _likeMessageArray;
 }
 
 #pragma mark - Table view data source
@@ -107,6 +121,20 @@
     
     [self.navigationController pushViewController:webViewController animated:YES];
     [webViewController loadWebViewWithUrl:URL];
+}
+
+//添加微博到收藏
+- (void)addLikeMessageWithMessage:(WeiboMessage *)message {
+    [self.likeMessageArray insertObject:message atIndex:0]; //使最新收藏的微博显示在最上面
+    
+    [MessageTool saveLikeMessage:_likeMessageArray];
+}
+
+//删除收藏的微博
+- (void)deleteLikeMessageWithMessage:(WeiboMessage *)message {
+    [self.likeMessageArray removeObject:message];
+    
+    [MessageTool saveLikeMessage:_likeMessageArray];
 }
 
 @end

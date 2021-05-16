@@ -76,14 +76,14 @@
 #pragma mark - 获取登陆的路径
 - (NSURL *)loadOAuthURL {
     ///应用程序信息
-    //    App Key：
+    //    App Key：(client_id)
     //    3240248154
     //    App Secret：
     //    8a51150c3d1050bdfd1d0183c6e6e02f
     //  https://api.weibo.com/oauth2/authorize
     //  授权回调页：https://api.weibo.com/oauth2/default.html
     //  取消授权回调页：https://api.weibo.com/oauth2/default.html
-    NSString *client_id = @"849752584";
+    NSString *client_id = @"3240248154";
     NSString *baseURL = @"https://api.weibo.com/oauth2/authorize";
     NSString *redirect_uri = @"https://api.weibo.com/oauth2/default.html";
     
@@ -97,7 +97,7 @@
 - (NSString *)getAccessTokenWithCode:(NSString *)code {
     //post请求
     NSString *client_id = @"3240248154";
-    NSString *client_secret = @"91ce9498571f054d4b55b6bfd406f0f7";
+    NSString *client_secret = @"8a51150c3d1050bdfd1d0183c6e6e02f";
     NSString *redirect_uri = @"https://api.weibo.com/oauth2/default.html";
     NSString *baseURLString = @"https://api.weibo.com/oauth2/access_token";
 
@@ -118,22 +118,16 @@
     
     NSURLSessionTask *task = [session dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error)
     {
-        NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:&error];
+        UserAccount *account = [UserAccountTool accountWithData:data];
         
-        access_token = [dict objectForKey:@"access_token"];
-        //账户信息转成模型
-        UserAccount *account = [UserAccount accountWithDictionary:dict];
         //储存账户信息
         [UserAccountTool saveAccount:account];
         
-        [self deleteWebCache];
         NSLog(@"%@",account.access_token);
-
-        NSLog(@"dict----%@",dict);
-        NSLog(@"access_token----%@",access_token);
     }];
     //创建的task是停止状态，需要启动
     [task resume];
+    [self deleteWebCache];
     
     return access_token;
 }

@@ -42,6 +42,9 @@ NS_ASSUME_NONNULL_BEGIN
 //评论数的frame
 @property (nonatomic, assign)CGRect comments_count_Btn_frame;
 
+//收藏按钮的frame
+@property (nonatomic, assign)CGRect like_Btn_frame;
+
 //cell的高度
 @property (nonatomic, assign)CGFloat rowHeight;
 

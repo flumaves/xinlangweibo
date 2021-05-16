@@ -15,6 +15,9 @@ NS_ASSUME_NONNULL_BEGIN
 ///微博数据模型
 @interface WeiboMessage : NSObject
 
+//是否为收藏的微博
+@property (nonatomic, strong)NSString *likeMessage;
+
 //原始的传入text （包含路径 正文）
 @property (nonatomic, strong)NSString *text;
 
