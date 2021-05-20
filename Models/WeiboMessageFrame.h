@@ -30,8 +30,11 @@ NS_ASSUME_NONNULL_BEGIN
 //正文的frame
 @property (nonatomic, assign)CGRect text_View_frame;
 
-//缩略配图的frame
+//缩略配图的frame    (单张图片）
 @property (nonatomic, assign)CGRect thumbnail_pic_frame;
+
+//多张图片配图的view
+@property (nonatomic, assign)CGRect imgView_frame;
 
 //点赞数的frame
 @property (nonatomic, assign)CGRect attitudes_count_Btn_frame;

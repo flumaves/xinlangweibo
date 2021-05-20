@@ -22,7 +22,7 @@
         self.thumbnail_pic   = dictionary[@"thumbnail_pic"];
         self.bmiddle_pic     = dictionary[@"bmiddle_pic"];
         self.original_pic    = dictionary[@"original_pic"];
-        self.pic_ids         = dictionary[@"pic_ids"];
+        self.pic_urls        = dictionary[@"pic_urls"];
         self.url             = [self getOriginalUrl];
         self.subText         = [self getSubText];
         self.attr            = [self setAttributedString];
@@ -36,7 +36,7 @@
 }
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"\n \ntext:%@ \nsource:%@ \ncreated_at:%@ \nreposts_count:%@ \n attitudes_count:%@ \n comments_count:%@ \nuser:%@ \nthumbnail_pic: %@ \nbmiddle_pic:%@ \noriginal_pic:%@ \npic_ids:%@", _text, _source, _created_at, _reposts_count, _attitudes_count, _comments_count, _user, _thumbnail_pic, _bmiddle_pic, _original_pic, _pic_ids];
+    return [NSString stringWithFormat:@"\n \ntext:%@ \nsource:%@ \ncreated_at:%@ \nreposts_count:%@ \n attitudes_count:%@ \n comments_count:%@ \nuser:%@ \nthumbnail_pic: %@ \nbmiddle_pic:%@ \noriginal_pic:%@ \npic_ids:%@", _text, _source, _created_at, _reposts_count, _attitudes_count, _comments_count, _user, _thumbnail_pic, _bmiddle_pic, _original_pic, _pic_urls];
 }
 
 #pragma mark - 从传来的originText中截取正文
@@ -72,6 +72,12 @@
         url_0 = (NSString *)url_1;
     }
     
+    if ([url_0 containsString:@" "]) {  //去掉空格
+        NSRange range = [url_0 rangeOfString:@" "];
+        NSString *urlString = [url_0 substringToIndex:range.location];
+        url_0 = urlString;
+    }
+    
     if ([url_0 containsString:@"@"]) {  //http://t.cn/A6VZMLzh @澎湃新闻 去掉@后面的内容
         NSRange range = [url_0 rangeOfString:@"@"];
         NSString *urlSting = [url_0 substringFromIndex:range.location];
@@ -93,6 +99,7 @@
         NSRange range = [text rangeOfString:@"全文"];
         //设置字体为蓝色
         [attr addAttribute:NSForegroundColorAttributeName value: [UIColor blueColor] range:range];
+        
         [attr addAttribute:NSLinkAttributeName value:@"quanwen://" range:range];
     }
     

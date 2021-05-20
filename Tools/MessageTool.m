@@ -13,6 +13,8 @@
 
 #define LAUNCHPATH [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:@"launch.archive"]
 
+#define IMAGEPATH [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:@"image.archive"]
+
 @implementation MessageTool
 
 #pragma mark - 将模型数组转化为NSData
@@ -36,7 +38,7 @@
             @"thumbnail_pic"    : message.thumbnail_pic ? message.thumbnail_pic : @"",
             @"bmiddle_pic"      : message.bmiddle_pic ? message.bmiddle_pic : @"",
             @"original_pic"     : message.original_pic ? message.original_pic : @"",
-            @"pic_ids"          : message.pic_ids ? message.pic_ids : @"",
+            @"pic_urls"          : message.pic_urls ? message.pic_urls : @"",
             @"likeMessage"      : message.likeMessage
         };
         
@@ -67,7 +69,7 @@
         @"thumbnail_pic"    : message.thumbnail_pic ? message.thumbnail_pic : @"",
         @"bmiddle_pic"      : message.bmiddle_pic ? message.bmiddle_pic : @"",
         @"original_pic"     : message.original_pic ? message.original_pic : @"",
-        @"pic_ids"          : message.pic_ids ? message.pic_ids : @"",
+        @"pic_urls"          : message.pic_urls ? message.pic_urls : @"",
         @"likeMessage"      : message.likeMessage
     };
     
@@ -172,5 +174,16 @@
     
     NSLog(@"解档_我的收藏");
     return likeMessageArray;
+}
+
+
+#pragma mark - 照片的存储
++ (void)saveImage:(NSData *)data {
+    [data writeToFile:IMAGEPATH atomically:YES];
+    
+}
+
++ (NSURL *)getImageURL {
+    return [NSURL URLWithString:IMAGEPATH];
 }
 @end

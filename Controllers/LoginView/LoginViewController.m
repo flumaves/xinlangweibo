@@ -24,7 +24,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
    
-    self.loginView = [[WKWebView alloc] initWithFrame:self.view.frame];
+    self.loginView = [[WKWebView alloc] initWithFrame:self.view.bounds];
     self.loginView.backgroundColor = [UIColor whiteColor];
     self.loginView.navigationDelegate = self;
     
@@ -83,7 +83,7 @@
     //  https://api.weibo.com/oauth2/authorize
     //  授权回调页：https://api.weibo.com/oauth2/default.html
     //  取消授权回调页：https://api.weibo.com/oauth2/default.html
-    NSString *client_id = @"3240248154";
+    NSString *client_id = @"849752584";
     NSString *baseURL = @"https://api.weibo.com/oauth2/authorize";
     NSString *redirect_uri = @"https://api.weibo.com/oauth2/default.html";
     
@@ -96,8 +96,8 @@
 #pragma mark - 获取access_token
 - (NSString *)getAccessTokenWithCode:(NSString *)code {
     //post请求
-    NSString *client_id = @"3240248154";
-    NSString *client_secret = @"8a51150c3d1050bdfd1d0183c6e6e02f";
+    NSString *client_id = @"849752584";
+    NSString *client_secret = @"91ce9498571f054d4b55b6bfd406f0f7";
     NSString *redirect_uri = @"https://api.weibo.com/oauth2/default.html";
     NSString *baseURLString = @"https://api.weibo.com/oauth2/access_token";
 

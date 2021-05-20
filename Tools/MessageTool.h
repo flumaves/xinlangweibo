@@ -30,6 +30,12 @@ NS_ASSUME_NONNULL_BEGIN
 //读取我的收藏
 + (NSMutableArray *)likeMessageArray;
 
+//储存照片
++ (void)saveImage:(NSData *)data;
+
+//读取照片
++ (NSURL *)getImageURL;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -58,30 +58,43 @@
     
     CGSize textSize = [text boundingRectWithSize:CGSizeMake([UIScreen mainScreen].bounds.size.width - 2 * magin, [UIScreen mainScreen].bounds.size.height * 10) options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName: TEXTFONT} context:nil].size;
  
-    _text_View_frame = CGRectMake(textX, textY, textSize.width + 3, textSize.height + 21);  //预留一行的空间
+    _text_View_frame = CGRectMake(textX - 5, textY, textSize.width + 3 + 10, textSize.height + 21);  //预留一行的空间
     
     //缩略图
-    if (_message.thumbnail_pic.length > 0) {
-        NSString *urlString = _message.original_pic;    //获取图片
-        NSURL *url = [NSURL URLWithString:urlString];
-        NSData *imgData = [NSData dataWithContentsOfURL:url];
-        UIImage *img = [UIImage imageWithData:imgData];
+    if (_message.pic_urls.count > 1) {  //多图
+        CGFloat imgMagin = 5;   //照片的间距
+        CGFloat imgViewX = magin;
+        CGFloat imgViewY = magin + CGRectGetMaxY(_text_View_frame);
+        CGFloat imgViewW = [UIScreen mainScreen].bounds.size.width - 2 * magin;
+        //单个小相片的宽度
+        CGFloat imgW = (imgViewW - 2 * imgMagin) / 3;
+        CGFloat imgViewH = (_message.pic_urls.count / 3) * (imgW + imgMagin) + imgW;
         
-        CGFloat thumbnailImgW = 300;
-        CGFloat thumbnailImgH  =300 * img.size.height / img.size.width; //比例缩放图片
-        CGFloat thumbnailImgX = magin;
-        CGFloat thumbnailImgY = CGRectGetMaxY(_text_View_frame) + magin;
-        _thumbnail_pic_frame = CGRectMake(thumbnailImgX, thumbnailImgY, thumbnailImgW, thumbnailImgH);
+        _imgView_frame = CGRectMake(imgViewX, imgViewY, imgViewW, imgViewH);
+    } else {    //只有一张图片
+        if (_message.thumbnail_pic.length > 0) {
+            CGFloat thumbnailImgW = 300;
+            CGFloat thumbnailImgH = 300;
+            CGFloat thumbnailImgX = magin;
+            CGFloat thumbnailImgY = CGRectGetMaxY(_text_View_frame) + magin;
+            _thumbnail_pic_frame = CGRectMake(thumbnailImgX, thumbnailImgY, thumbnailImgW, thumbnailImgH);
+        }
     }
+    
     
     //底下三个控件统一宽度    高度  Y
     CGFloat lblW = [UIScreen mainScreen].bounds.size.width / 4;
     CGFloat lblH = 30;
     CGFloat lblY;
-    if (_message.thumbnail_pic.length > 0) {
-        lblY = CGRectGetMaxY(_thumbnail_pic_frame) +magin;
-    } else {
-        lblY = CGRectGetMaxY(_text_View_frame);
+    
+    if (_message.pic_urls.count > 1) {  //多图
+        lblY = CGRectGetMaxY(_imgView_frame) + magin;
+    } else {                            //单图
+        if (_message.thumbnail_pic.length > 0) {
+            lblY = CGRectGetMaxY(_thumbnail_pic_frame) +magin;
+        } else {                        //无图
+            lblY = CGRectGetMaxY(_text_View_frame);
+        }
     }
     
     //点赞数

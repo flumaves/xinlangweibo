@@ -7,6 +7,17 @@
 
 #import "MessageCell.h"
 
+//获取图片的block
+UIImage *(^getImgBlock)(NSString *) = ^(NSString *urlString){
+    NSURL *url = [NSURL URLWithString:urlString];
+    
+    NSData *imgData = [NSData dataWithContentsOfURL:url];
+    
+    UIImage *img = [UIImage imageWithData:imgData];
+    
+    return img;
+};
+
 @interface MessageCell () <UITextViewDelegate>
 //是否为收藏的微博
 @property (nonatomic, strong)NSString *likeMessage;
@@ -37,6 +48,9 @@
 
 //缩略图
 @property (nonatomic, strong)UIImageView *thumbnail_pic;
+
+//多组图片的view
+@property (nonatomic, strong)UIView *imgView;
 
 @end
 
@@ -96,9 +110,13 @@
 
         //缩略图
         _thumbnail_pic = [[UIImageView alloc] init];
-//        _thumbnail_pic.contentMode = UIViewContentModeScaleAspectFill;
-//        _thumbnail_pic.clipsToBounds = YES;
+        _thumbnail_pic.contentMode = UIViewContentModeScaleAspectFill;
+        _thumbnail_pic.clipsToBounds = YES;
         [self.contentView addSubview:_thumbnail_pic];
+        
+        //多组图片
+        _imgView = [[UIView alloc] init];
+        [self.contentView addSubview:_imgView];
     }
     return self;
 }
@@ -114,7 +132,7 @@
     //用户图片
     _user_Img.frame = messageFrame.user_Img_frame;
     //获取用户头像
-    self.user_Img.image = [self getImgWithUrlString:messageFrame.message.user.profile_image_url];
+    [self getHeadImgWithUrlString:messageFrame.message.user.profile_image_url];
 
     //用户的昵称
     _screen_name_Lbl.frame = messageFrame.screen_name_Lbl_frame;
@@ -154,25 +172,70 @@
     }
     
     //缩略图
-    _thumbnail_pic.frame = messageFrame.thumbnail_pic_frame;
-    if (messageFrame.message.thumbnail_pic == NULL) {
+    if (_messageFrame.message.pic_urls.count > 1) {
+        _imgView.frame = _messageFrame.imgView_frame;
         _thumbnail_pic.hidden = YES;
-    } else {
-        _thumbnail_pic.hidden = NO;
-        _thumbnail_pic.image = [self getImgWithUrlString:messageFrame.message.original_pic];
-    }
+        _imgView.hidden = NO;
+        
+        //请求图片
+        dispatch_async(dispatch_get_global_queue(0, 0), ^{
+            CGFloat imgMagin = 5;   //图片之间的间隙
+            CGFloat imgL = (self.messageFrame.imgView_frame.size.width - 2 * imgMagin) / 3;
+            int columns = 3; //确定每一行有三张图片
+            for (int i = 0; i< self.messageFrame.message.pic_urls.count; i++) {
+                CGFloat imgX = (imgMagin + imgL) * (i % columns);
+                CGFloat imgY = (imgMagin + imgL) * (i / columns);
+                
+                NSDictionary *dict = self.messageFrame.message.pic_urls[i];
+                NSString *urlString = dict[@"thumbnail_pic"];
+
+                NSURL *url = [NSURL URLWithString:urlString];
+                NSData *imgData = [NSData dataWithContentsOfURL:url];
+
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    UIImageView *imgView = [[UIImageView alloc] initWithFrame:CGRectMake(imgX, imgY, imgL, imgL)];
+                    imgView.contentMode = UIViewContentModeScaleAspectFill;
+                    imgView.clipsToBounds = YES;
+                        
+                    imgView.image = [UIImage imageWithData:imgData];
+                    [self.imgView addSubview:imgView];
+                });
+            }
+    });
+        } else {
+            _thumbnail_pic.frame = messageFrame.thumbnail_pic_frame;
+            if (messageFrame.message.thumbnail_pic == NULL) {
+                _thumbnail_pic.hidden = YES;
+                _imgView.hidden = YES;
+            } else {
+                _thumbnail_pic.hidden = NO;
+                _imgView.hidden = YES;
+                [self getThumbnailImgWithUrlString:messageFrame.message.original_pic];
+            }
+        }
 }
 
-
-//通过url获取图片
-- (UIImage *)getImgWithUrlString:(NSString *)urlString {
-    NSURL *url = [NSURL URLWithString:urlString];
-    
-    NSData *imgData = [NSData dataWithContentsOfURL:url];
-    
-    UIImage *img = [UIImage imageWithData:imgData];
-    
-    return img;
+//通过url获取头像
+- (void)getHeadImgWithUrlString:(NSString *)urlString {
+    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+        NSURL *url = [NSURL URLWithString:urlString];
+        NSData *imgData = [NSData dataWithContentsOfURL:url];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.user_Img.image = [UIImage imageWithData:imgData];
+        });
+    });
+}
+//获取缩略图
+- (void)getThumbnailImgWithUrlString:(NSString *)urlString {
+    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+        NSURL *url = [NSURL URLWithString:urlString];
+        NSData *imgData = [NSData dataWithContentsOfURL:url];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.thumbnail_pic.image = [UIImage imageWithData:imgData];
+        });
+    });
 }
 
 //点击收藏按钮
@@ -210,11 +273,16 @@
     //时间差
     NSTimeInterval time = currentTime - creatTime;
     
-    NSInteger sec = time / 60;
+    NSInteger sec = time;
     if (sec < 60) {
-        return [NSString stringWithFormat:@"%ld分钟前",sec];
+        return [NSString stringWithFormat:@"%ld秒前",(long)sec];
     }
-    //秒转小时
+    //秒转分钟
+    NSInteger min = sec / 60;
+    if (min < 60) {
+        return [NSString stringWithFormat:@"%ld分钟前",min];
+    }
+    //分钟转小时
     NSInteger hour = sec / 60;
     if (hour < 24) {
         return [NSString stringWithFormat:@"%ld小时前",hour];
@@ -236,7 +304,7 @@
 
 #pragma mark - textView代理方法
 - (BOOL)textView:(UITextView *)textView shouldInteractWithURL:(NSURL *)URL inRange:(NSRange)characterRange interaction:(UITextItemInteraction)interaction {
-    if ([[URL scheme] isEqualToString:@"quanwen"]) {
+    if ([[URL scheme] isEqual:@"quanwen"]) {
         if ([self.delegate respondsToSelector:@selector(openUrl:)]) {
             [self.delegate openUrl:[NSURL URLWithString:self.messageFrame.message.url]];
             NSLog(@"url----%@",_messageFrame.message.url);

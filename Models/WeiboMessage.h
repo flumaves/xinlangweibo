@@ -61,7 +61,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, strong)NSString *original_pic;
 
 //微博配图ID。多图时返回多图ID
-@property (nonatomic, strong)NSMutableArray *pic_ids;
+@property (nonatomic, strong)NSMutableArray *pic_urls;
 
 - (instancetype)initWithDictionary:(NSDictionary *)dictionary;
 

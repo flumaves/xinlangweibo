@@ -30,6 +30,7 @@
     [super viewDidLoad];
     
     self.tableView.tableFooterView = [UIView new];
+    self.navigationItem.leftBarButtonItem.tintColor = [UIColor orangeColor];
 }
 
 
@@ -118,9 +119,9 @@
 //cell的代理方法
 - (void)openUrl:(NSURL *)URL {
     WebViewController *webViewController = [[WebViewController alloc] init];
+    [webViewController loadWebViewWithUrl:URL];
     
     [self.navigationController pushViewController:webViewController animated:YES];
-    [webViewController loadWebViewWithUrl:URL];
 }
 
 //添加微博到收藏
