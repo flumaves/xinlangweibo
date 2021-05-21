@@ -6,16 +6,73 @@
 //
 
 #import "MessageTool.h"
-
-#define HISTORYPATH [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:@"history.archive"]
-
-#define LIKEPATH [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:@"like.archive"]
-
-#define LAUNCHPATH [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:@"launch.archive"]
+#import "UserAccountTool.h"
+#import "UserAccount.h"
 
 #define IMAGEPATH [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:@"image.archive"]
 
+@interface MessageTool ()
+//储存登陆的账户
+@property (nonatomic, strong)UserAccount *account;
+
+@end
+
 @implementation MessageTool
+
+- (UserAccount *)account {
+    if (_account == nil) {
+        _account = [UserAccountTool account];
+    }
+    return _account;
+}
+
+
+#pragma mark - 获取存储的路径
+//浏览历史
+- (NSString *)getHistoryPath {
+    NSString *string = [NSString stringWithFormat:@"%@_history.archive",self.account.uid];
+    
+    NSString *path = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:string];
+    
+    return path;
+}
+
++ (NSString *)getHistoryPath {
+    MessageTool *tool = [[MessageTool alloc] init];
+    NSString *path = [tool getHistoryPath];
+    return path;
+}
+
+//我的发表
+- (NSString *)getLaunchPath {
+    NSString *string = [NSString stringWithFormat:@"%@_launch.archive",self.account.uid];
+    
+    NSString *path = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:string];
+    
+    return path;
+}
+
++ (NSString *)getLaunchPath {
+    MessageTool *tool = [[MessageTool alloc] init];
+    NSString *path = [tool getLaunchPath];
+    return path;
+}
+
+//我的收藏
+- (NSString *)getLikePath {
+    NSString *string = [NSString stringWithFormat:@"%@_like.archive",self.account.uid];
+    
+    NSString *path = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:string];
+    
+    return path;
+}
+
++ (NSString *)getLikePath {
+    MessageTool *tool = [[MessageTool alloc] init];
+    NSString *path = [tool getLikePath];
+    return path;
+}
+
 
 #pragma mark - 将模型数组转化为NSData
 + (NSData *)getDataWithMessageArray:(NSMutableArray *)messageArray {
@@ -112,16 +169,16 @@
     //将数组转为NSData
     NSData *data = [MessageTool getDataWithMessageArray:historyMessageArray];
     
-    [data writeToFile:HISTORYPATH atomically:YES];
+    [data writeToFile:[self getHistoryPath] atomically:YES];
     
     NSLog(@"归档_浏览历史");
-    NSLog(@"%@",HISTORYPATH);
+    NSLog(@"%@",[self getHistoryPath]);
 }
 
 //读取浏览历史
 + (NSMutableArray *)historyMessageArray {
     //解档获取数据
-    NSData *data = [NSData dataWithContentsOfFile:HISTORYPATH];
+    NSData *data = [NSData dataWithContentsOfFile:[self getHistoryPath]];
     //转为数组
     NSMutableArray *historyMessageArray = [MessageTool messageArrayWithData:data];
     
@@ -137,15 +194,15 @@
     
     NSData *data = [MessageTool getDataWithMessageArray:launchMessageArray];
     
-    [data writeToFile:LAUNCHPATH atomically:YES];
+    [data writeToFile:[self getLaunchPath] atomically:YES];
     
     NSLog(@"归档_我的发表");
-    NSLog(@"%@",LAUNCHPATH);
+    NSLog(@"%@",[self getLaunchPath]);
 }
 
 //读取我的发表
 + (NSMutableArray *)launchMessageArray {
-    NSData *data = [NSData dataWithContentsOfFile:LAUNCHPATH];
+    NSData *data = [NSData dataWithContentsOfFile:[self getLaunchPath]];
     
     NSMutableArray *launchMessageArray = [MessageTool messageArrayWithData:data];
     
@@ -159,18 +216,17 @@
 + (void)saveLikeMessage:(NSMutableArray *)likeMessageArray {
     NSData *data = [MessageTool getDataWithMessageArray:likeMessageArray];
     
-    [data writeToFile:LIKEPATH atomically:YES];
+    [data writeToFile:[self getLikePath] atomically:YES];
     
     NSLog(@"归档_我的收藏");
-    NSLog(@"%@",LIKEPATH);
+    NSLog(@"%@",[self getLikePath]);
 }
 
 //读取我的收藏
 + (NSMutableArray *)likeMessageArray {
-    NSData *data = [NSData dataWithContentsOfFile:LIKEPATH];
+    NSData *data = [NSData dataWithContentsOfFile:[self getLikePath]];
     
     NSMutableArray *likeMessageArray = [MessageTool messageArrayWithData:data];
-    
     
     NSLog(@"解档_我的收藏");
     return likeMessageArray;

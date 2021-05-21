@@ -29,6 +29,7 @@
 		9BF534E7264C27120044F3E7 /* WebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BF534E6264C27120044F3E7 /* WebViewController.m */; };
 		9BF5356D264D3F910044F3E7 /* StatusTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BF5356C264D3F910044F3E7 /* StatusTableViewController.m */; };
 		9BF53570264D73FB0044F3E7 /* MessageTool.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BF5356F264D73FB0044F3E7 /* MessageTool.m */; };
+		9BF536082657496C0044F3E7 /* SearchHistoryTool.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BF536072657496C0044F3E7 /* SearchHistoryTool.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -95,6 +96,8 @@
 		9BF5356C264D3F910044F3E7 /* StatusTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = StatusTableViewController.m; sourceTree = "<group>"; };
 		9BF5356E264D73FB0044F3E7 /* MessageTool.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MessageTool.h; sourceTree = "<group>"; };
 		9BF5356F264D73FB0044F3E7 /* MessageTool.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MessageTool.m; sourceTree = "<group>"; };
+		9BF536062657496C0044F3E7 /* SearchHistoryTool.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SearchHistoryTool.h; sourceTree = "<group>"; };
+		9BF536072657496C0044F3E7 /* SearchHistoryTool.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SearchHistoryTool.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -288,6 +291,8 @@
 				9B3411782647909200122D3E /* UserAccountTool.m */,
 				9BF5356E264D73FB0044F3E7 /* MessageTool.h */,
 				9BF5356F264D73FB0044F3E7 /* MessageTool.m */,
+				9BF536062657496C0044F3E7 /* SearchHistoryTool.h */,
+				9BF536072657496C0044F3E7 /* SearchHistoryTool.m */,
 			);
 			path = Tools;
 			sourceTree = "<group>";
@@ -437,6 +442,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9BF536082657496C0044F3E7 /* SearchHistoryTool.m in Sources */,
 				9B7D57C5263EB70800E8B2A1 /* HomeTableViewController.m in Sources */,
 				9B34120F26497F7A00122D3E /* WeiboMessageFrame.m in Sources */,
 				9B7D578D263EB4D900E8B2A1 /* AppDelegate.m in Sources */,
