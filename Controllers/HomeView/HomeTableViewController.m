@@ -54,11 +54,16 @@
 
 #pragma mark - 检测tableview的偏移量
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
+    //上拉加载
     if (scrollView.contentOffset.y + scrollView.frame.size.height >= scrollView.contentSize.height + [UIScreen mainScreen].bounds.size.height * 0.15) {
         NSLog(@"上拉加载");
+        [self loadMoreMessageWithAccess_token:self.account.access_token];
     }
+    
+    //下拉刷新
     if (scrollView.contentOffset.y <= -[UIScreen mainScreen].bounds.size.height * 0.15) {
         NSLog(@"下拉刷新");
+        [self loadWeiboMessageWithAccess_token:self.account.access_token];
     }
 }
 
@@ -103,6 +108,7 @@
         NSString *baseURL = @"https://api.weibo.com/2/statuses/home_timeline.json";
 
         NSString *urlString = [NSString stringWithFormat:@"%@?access_token=%@",baseURL ,access_token];
+        
         NSURL *url = [NSURL URLWithString:urlString];
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
         
@@ -161,6 +167,72 @@
         [task resume];
     });
 }
+
+
+#pragma mark - 加载更早的微博数据
+- (void)loadMoreMessageWithAccess_token:(NSString *)access_token {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        //获取max_id
+        WeiboMessageFrame *messageFrame = self.messageFrameArray.lastObject;
+        WeiboMessage *message = messageFrame.message;
+        NSNumber *max_id = message.ID;
+        
+        NSString *baseURL = @"https://api.weibo.com/2/statuses/home_timeline.json";
+
+        NSString *urlString = [NSString stringWithFormat:@"%@?access_token=%@&max_id=%@",baseURL ,access_token, max_id];
+        NSURL *url = [NSURL URLWithString:urlString];
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
+        
+        NSURLSession *session = [NSURLSession sharedSession];
+        
+        NSURLSessionTask *task = [session dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error)
+        {
+            if (error) {
+                NSLog(@"%@",error);
+                return;
+            }
+            //反序列化返回的数据
+            NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:NULL];
+
+            //获取数据中的statuses数组
+            NSMutableArray *dictArray = dict[@"statuses"];
+
+            //字典数组 转 模型数组
+            NSMutableArray *messageFrameArray = [NSMutableArray array];
+
+            for (NSDictionary *dictionary in dictArray) {
+                //微博数据
+                WeiboMessage *message = [WeiboMessage messageWithDictionary:dictionary];
+                
+                if (message.ID == max_id) {     //如果是已经存在的微博，就跳过
+                    continue;
+                }
+                //遍历看有无已经收藏了的微博
+                for (WeiboMessage *likeMessage in self.likeMessageArray) {
+                    if (likeMessage.ID == message.ID) { //同一条微博
+                        message.likeMessage = likeMessage.likeMessage;
+                    }
+                }
+                
+                //封装成frame模型
+                WeiboMessageFrame *messageFrame = [[WeiboMessageFrame alloc] init];
+                messageFrame.message = message;
+                //frame模型数组
+                [messageFrameArray addObject:messageFrame];
+            }
+
+            [self.messageFrameArray addObjectsFromArray:messageFrameArray];
+            NSLog(@"网络请求完毕");
+            
+            dispatch_sync(dispatch_get_main_queue(), ^{
+                [self.tableView reloadData];
+            });
+        }];
+        //创建的task是停止状态，需要启动
+        [task resume];
+    });
+}
+
 
 #pragma mark - 加载子控件
 - (void)loadSubViews {
