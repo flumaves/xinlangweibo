@@ -283,7 +283,7 @@ UIImage *(^getImgBlock)(NSString *) = ^(NSString *urlString){
         return [NSString stringWithFormat:@"%ld分钟前",min];
     }
     //分钟转小时
-    NSInteger hour = sec / 60;
+    NSInteger hour = min / 60;
     if (hour < 24) {
         return [NSString stringWithFormat:@"%ld小时前",hour];
     }

@@ -33,6 +33,11 @@
     self.tableView = tableView;
 }
 
+- (void)addHistory {
+    NSLog(@"%s",__func__);
+}
+
+
 #pragma mark - Table view data source
 //静态单元格
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {

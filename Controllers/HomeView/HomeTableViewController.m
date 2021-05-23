@@ -7,6 +7,7 @@
 
 
 #import "HomeTableViewController.h"
+#import "SearchViewViewController.h"
 #import "WeiboMessageFrame.h"
 #import "MessageCell.h"
 #import "WebViewController.h"
@@ -28,12 +29,6 @@
 //搜索栏
 @property (nonatomic, strong)UISearchBar *searchBar;
 
-//判断是否在搜索
-@property (nonatomic, getter = isSearching)BOOL search;
-
-//搜索结果
-@property (nonatomic, strong)NSMutableArray *resultFrameArray;
-
 @end
 
 @implementation HomeTableViewController
@@ -44,8 +39,6 @@
     
     //加载子控件
     [self loadSubViews];
-    //添加手势
-    [self addGesture];
     
     self.tableView.tableFooterView = [UIView new];
     self.tableView.delegate = self;
@@ -69,13 +62,6 @@
 
 
 #pragma mark - 数据的懒加载
-//储存搜索结果的数组
-- (NSMutableArray *)resultFrameArray {
-    if (_resultFrameArray == nil) {
-        _resultFrameArray = [[NSMutableArray alloc] init];
-    }
-    return _resultFrameArray;
-}
 //登陆的用户
 - (UserAccount *)account {
     if (_account == nil) {
@@ -176,10 +162,12 @@
         WeiboMessageFrame *messageFrame = self.messageFrameArray.lastObject;
         WeiboMessage *message = messageFrame.message;
         NSNumber *max_id = message.ID;
+        //请求微博的数量
+        NSNumber *count = [NSNumber numberWithInt:10];
         
         NSString *baseURL = @"https://api.weibo.com/2/statuses/home_timeline.json";
 
-        NSString *urlString = [NSString stringWithFormat:@"%@?access_token=%@&max_id=%@",baseURL ,access_token, max_id];
+        NSString *urlString = [NSString stringWithFormat:@"%@?access_token=%@&max_id=%@&count=%@",baseURL ,access_token, max_id, count];
         NSURL *url = [NSURL URLWithString:urlString];
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
         
@@ -236,75 +224,28 @@
 
 #pragma mark - 加载子控件
 - (void)loadSubViews {
-    //searchBar
-    CGFloat searchBarW = [UIScreen mainScreen].bounds.size.width;
-    CGFloat searchBarH = 56;
-    _searchBar = [[UISearchBar alloc] initWithFrame:CGRectMake(0, 0, searchBarW, searchBarH)];
-    [_searchBar setPlaceholder:@"搜索"];
-    _searchBar.delegate = self;
-    _searchBar.barStyle = UIBarStyleDefault;
-    self.tableView.tableHeaderView = _searchBar;
-    
+//    //searchBar
+//    CGFloat searchBarW = [UIScreen mainScreen].bounds.size.width;
+//    CGFloat searchBarH = 56;
+//    _searchBar = [[UISearchBar alloc] initWithFrame:CGRectMake(0, 0, searchBarW, searchBarH)];
+//    [_searchBar setPlaceholder:@"搜索"];
+//    _searchBar.delegate = self;
+//    _searchBar.barStyle = UIBarStyleDefault;
+//    self.tableView.tableHeaderView = _searchBar;
+//
+    //leftBarButton
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSearch target:self action:@selector(searchMessage)];
+    self.navigationItem.leftBarButtonItem.tintColor = [UIColor orangeColor];
+
     //rightBarButton
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(loadNewMessages)];
     self.navigationItem.rightBarButtonItem.tintColor = [UIColor orangeColor];
 }
 
-#pragma mark - searchBar的代理方法
-- (BOOL)searchBarShouldEndEditing:(UISearchBar *)searchBar {
-    return YES;
-}
-
-- (void)searchBarTextDidBeginEditing:(UISearchBar *)searchBar {
-    self.tableView.scrollEnabled = NO;
-    //清除存放搜索结果的数组
-    [self.resultFrameArray removeAllObjects];
-    self.search = YES;
-}
-
-- (void)searchBarTextDidEndEditing:(UISearchBar *)searchBar {
-    self.tableView.scrollEnabled = YES;
-    if (searchBar.text.length == 0) {
-        self.search = NO;
-    }
-}
-
-- (void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText {
-    if (searchBar.text.length == 0) {   //当搜索完东西 重新清除搜索框时 清空搜索的结果
-        [self.resultFrameArray removeAllObjects];
-    }
-    
-    NSString *searchString = _searchBar.text;
-    
-    dispatch_async(dispatch_get_global_queue(0, 0), ^{
-        if (searchString.length > 0 && searchString != nil) {
-            //遍历存放微博的数组
-            for (WeiboMessageFrame *messageFrame in self.messageFrameArray) {
-                WeiboMessage *message= messageFrame.message;
-                if ([message.subText containsString:searchString]) {
-                    //正文中包含搜索内容
-                    //添加frame模型到搜索结果中
-                    [self.resultFrameArray addObject:messageFrame];
-                } else if ([message.user.screen_name containsString:searchString]) {
-                    //昵称中包含搜索内容
-                    [self.resultFrameArray addObject:messageFrame];
-                }
-            }
-            //遍历结束 回到主线程 刷新
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self.tableView reloadData];
-            });
-        }
-    });
-}
 
 #pragma mark - tableView数据源方法
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    if ([self isSearching]) {   //返回搜索结果
-        return self.resultFrameArray.count;
-    } else {                    //返回数据
-        return self.messageFrameArray.count;;
-    }
+    return self.messageFrameArray.count;;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -312,17 +253,10 @@
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    if ([self isSearching]) {
-        if (indexPath.section < _resultFrameArray.count) {
-            WeiboMessageFrame *messageFrame = self.resultFrameArray[indexPath.section];
-            return messageFrame.rowHeight;
-        } else return 200;
-    } else {
-        if (indexPath.section < _messageFrameArray.count) {
-            WeiboMessageFrame *messageFrame = self.messageFrameArray[indexPath.section];
-            return messageFrame.rowHeight;
-        } else return 200;
-    }
+    if (indexPath.section < _messageFrameArray.count) {
+        WeiboMessageFrame *messageFrame = self.messageFrameArray[indexPath.section];
+        return messageFrame.rowHeight;
+    } else return 200;
 }
 
 ///cell被点击
@@ -340,11 +274,7 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     WeiboMessageFrame *messageFrame = [[WeiboMessageFrame alloc] init];
     
-    if ([self isSearching]) {
-        messageFrame = _resultFrameArray[indexPath.section];
-    } else {
-        messageFrame = _messageFrameArray[indexPath.section];
-    }
+    messageFrame = _messageFrameArray[indexPath.section];
 
     NSString *ID = @"message";
     
@@ -362,19 +292,23 @@
     return cell;
 }
 
+
 #pragma mark - navigationItem的点击方法
+//跳转到搜索页面
+- (void)searchMessage {
+    SearchViewViewController *searchViewController = [[SearchViewViewController alloc] initWithBounds:self.navigationController.navigationBar.frame];
+    //传入数组
+    searchViewController.messageFrameArray = self.messageFrameArray;
+    
+    [self.navigationController pushViewController:searchViewController animated:YES];
+}
+
 //右上角点击刷新按钮
 - (void)loadNewMessages {
     //点击刷新后滚回顶部
     [self.tableView scrollsToTop];
     
     [self loadWeiboMessageWithAccess_token:self.account.access_token];
-    self.search = NO;
-}
-
-- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    [self.searchBar resignFirstResponder];
-    self.search = NO;
 }
 
 
@@ -411,24 +345,6 @@
     if ([self.delegate respondsToSelector:@selector(addHistoryMessageArrayWithMessage:)]) {
         [self.delegate addHistoryMessageArrayWithMessage:message];
     }
-}
-
-
-#pragma mark - 添加手势
-- (void)addGesture {
-    //向上轻扫
-    UISwipeGestureRecognizer *swipeUp = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipe:)];
-    swipeUp.direction = UISwipeGestureRecognizerDirectionUp;
-    [self.tableView addGestureRecognizer:swipeUp];
-    
-    UISwipeGestureRecognizer *swipeDown = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipe:)];
-    swipeDown.direction = UISwipeGestureRecognizerDirectionDown;
-    [self.tableView addGestureRecognizer:swipeDown];
-}
-
-//当处在搜索状态时 才会触发响应
-- (void)swipe:(UITapGestureRecognizer *)sender {
-    [self.searchBar resignFirstResponder];
 }
 
 @end

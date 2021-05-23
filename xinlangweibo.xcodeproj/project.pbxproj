@@ -30,6 +30,7 @@
 		9BF5356D264D3F910044F3E7 /* StatusTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BF5356C264D3F910044F3E7 /* StatusTableViewController.m */; };
 		9BF53570264D73FB0044F3E7 /* MessageTool.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BF5356F264D73FB0044F3E7 /* MessageTool.m */; };
 		9BF536082657496C0044F3E7 /* SearchHistoryTool.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BF536072657496C0044F3E7 /* SearchHistoryTool.m */; };
+		9BF5360B26591B490044F3E7 /* SearchViewViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BF5360A26591B490044F3E7 /* SearchViewViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -98,6 +99,8 @@
 		9BF5356F264D73FB0044F3E7 /* MessageTool.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MessageTool.m; sourceTree = "<group>"; };
 		9BF536062657496C0044F3E7 /* SearchHistoryTool.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SearchHistoryTool.h; sourceTree = "<group>"; };
 		9BF536072657496C0044F3E7 /* SearchHistoryTool.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SearchHistoryTool.m; sourceTree = "<group>"; };
+		9BF5360926591B490044F3E7 /* SearchViewViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SearchViewViewController.h; sourceTree = "<group>"; };
+		9BF5360A26591B490044F3E7 /* SearchViewViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SearchViewViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -242,6 +245,7 @@
 		9B7D57C1263EB6CB00E8B2A1 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				9BF5360C26591B560044F3E7 /* SearchView */,
 				9BF5356A264D3F1B0044F3E7 /* StatusView */,
 				9BF534E4264C26EF0044F3E7 /* WebVIew */,
 				9B34117D264801F100122D3E /* VisitorView */,
@@ -313,6 +317,15 @@
 				9BF5356C264D3F910044F3E7 /* StatusTableViewController.m */,
 			);
 			path = StatusView;
+			sourceTree = "<group>";
+		};
+		9BF5360C26591B560044F3E7 /* SearchView */ = {
+			isa = PBXGroup;
+			children = (
+				9BF5360926591B490044F3E7 /* SearchViewViewController.h */,
+				9BF5360A26591B490044F3E7 /* SearchViewViewController.m */,
+			);
+			path = SearchView;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -461,6 +474,7 @@
 				9B34117C2647F65800122D3E /* Useraccount.m in Sources */,
 				9B7D57CB263EB78200E8B2A1 /* FindTableViewController.m in Sources */,
 				9BF53570264D73FB0044F3E7 /* MessageTool.m in Sources */,
+				9BF5360B26591B490044F3E7 /* SearchViewViewController.m in Sources */,
 				9B7D57C8263EB71300E8B2A1 /* MessageTableViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
