@@ -10,16 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol HomeTableViewControllerDelegate <NSObject>
-
-@optional
-- (void)addHistoryMessageArrayWithMessage:(WeiboMessage *)message;
-
-@end
-
 @interface HomeTableViewController : UITableViewController
-
-@property (nonatomic, weak)id<HomeTableViewControllerDelegate> delegate;
 
 @end
 

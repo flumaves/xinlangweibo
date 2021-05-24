@@ -6,6 +6,7 @@
 //
 
 #import "MessageCell.h"
+#import "MessageTool.h"
 
 //获取图片的block
 UIImage *(^getImgBlock)(NSString *) = ^(NSString *urlString){
@@ -62,7 +63,7 @@ UIImage *(^getImgBlock)(NSString *) = ^(NSString *urlString){
 
         //顶部分割
         _topDividView = [[UIView alloc] init];
-        _topDividView.backgroundColor = [UIColor darkGrayColor];
+        _topDividView.backgroundColor = [UIColor colorWithRed:245 / 255.0 green:245 / 255.0 blue:245 / 255.0 alpha:1];
         [self.contentView addSubview:_topDividView];
         
         //用户头像
@@ -97,7 +98,7 @@ UIImage *(^getImgBlock)(NSString *) = ^(NSString *urlString){
         
         //点赞按钮
         _like_Btn = [[UIButton alloc] init];
-        [_like_Btn addTarget:self action:@selector(likeMessage:) forControlEvents:UIControlEventTouchUpInside];
+        [_like_Btn addTarget:self action:@selector(likeMessageBtnClick) forControlEvents:UIControlEventTouchUpInside];
         [self.contentView addSubview:_like_Btn];
 
         //正文
@@ -201,22 +202,23 @@ UIImage *(^getImgBlock)(NSString *) = ^(NSString *urlString){
                     [self.imgView addSubview:imgView];
                 });
             }
-    });
+        });
+    } else {
+        _thumbnail_pic.frame = messageFrame.thumbnail_pic_frame;
+        if (messageFrame.message.thumbnail_pic == NULL) {
+            _thumbnail_pic.hidden = YES;
+            _imgView.hidden = YES;
         } else {
-            _thumbnail_pic.frame = messageFrame.thumbnail_pic_frame;
-            if (messageFrame.message.thumbnail_pic == NULL) {
-                _thumbnail_pic.hidden = YES;
-                _imgView.hidden = YES;
-            } else {
-                _thumbnail_pic.hidden = NO;
-                _imgView.hidden = YES;
-                [self getThumbnailImgWithUrlString:messageFrame.message.original_pic];
-            }
+            _thumbnail_pic.hidden = NO;
+            _imgView.hidden = YES;
+            [self getThumbnailImgWithUrlString:messageFrame.message.original_pic];
         }
+    }
 }
 
 //通过url获取头像
 - (void)getHeadImgWithUrlString:(NSString *)urlString {
+    //请求网络的图片
     dispatch_async(dispatch_get_global_queue(0, 0), ^{
         NSURL *url = [NSURL URLWithString:urlString];
         NSData *imgData = [NSData dataWithContentsOfURL:url];
@@ -226,35 +228,43 @@ UIImage *(^getImgBlock)(NSString *) = ^(NSString *urlString){
         });
     });
 }
+
 //获取缩略图
 - (void)getThumbnailImgWithUrlString:(NSString *)urlString {
-    dispatch_async(dispatch_get_global_queue(0, 0), ^{
-        NSURL *url = [NSURL URLWithString:urlString];
-        NSData *imgData = [NSData dataWithContentsOfURL:url];
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            self.thumbnail_pic.image = [UIImage imageWithData:imgData];
+    if ([urlString containsString:@"http"]) {   //判断路径是网络的还是本地的
+        dispatch_async(dispatch_get_global_queue(0, 0), ^{
+            NSURL *url = [NSURL URLWithString:urlString];
+            NSData *imgData = [NSData dataWithContentsOfURL:url];
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                self.thumbnail_pic.image = [UIImage imageWithData:imgData];
+            });
         });
-    });
+    } else {
+        NSData *data = [MessageTool getImageDataWithURLString:urlString];
+        
+        self.thumbnail_pic.image = [UIImage imageWithData:data];
+    }
 }
 
 //点击收藏按钮
-- (void)likeMessage:(WeiboMessage *)message {
+- (void)likeMessageBtnClick {
     if ([self.likeMessage isEqual:@"YES"]) {     //取消收藏
         _likeMessage = @"NO";
         _messageFrame.message.likeMessage = @"NO";
         [_like_Btn setImage: [UIImage imageNamed:@"unlike"] forState:UIControlStateNormal];
-        if ([self.delegate respondsToSelector:@selector(deleteLikeMessageWithMessage:)]) {  //从收藏的数据中删除
-            [self.delegate deleteLikeMessageWithMessage:self.messageFrame.message];
-        }
+        
+        NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+        //发送 收藏微博 的通知
+        [center postNotificationName:@"deleteLikeMessage" object:_messageFrame.message];
     } else {                                     //收藏
         _likeMessage = @"YES";
         _messageFrame.message.likeMessage = @"YES";
         [_like_Btn setImage: [UIImage imageNamed:@"like"] forState:UIControlStateNormal];
-        if ([self.delegate respondsToSelector:@selector(addLikeMessageWithMessage:)]) {
-            [self.delegate addLikeMessageWithMessage:self.messageFrame.message];
-            //添加微博到收藏的数据中
-        }
+        
+        NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+        //发送 取消收藏微博 的通知
+        [center postNotificationName:@"addLikeMessage" object:_messageFrame.message];
     }
 }
 
@@ -305,10 +315,8 @@ UIImage *(^getImgBlock)(NSString *) = ^(NSString *urlString){
 #pragma mark - textView代理方法
 - (BOOL)textView:(UITextView *)textView shouldInteractWithURL:(NSURL *)URL inRange:(NSRange)characterRange interaction:(UITextItemInteraction)interaction {
     if ([[URL scheme] isEqual:@"quanwen"]) {
-        if ([self.delegate respondsToSelector:@selector(openUrl:)]) {
-            [self.delegate openUrl:[NSURL URLWithString:self.messageFrame.message.url]];
-            NSLog(@"url----%@",_messageFrame.message.url);
-        }
+        NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+        [center postNotificationName:@"openUrl" object:[NSURL URLWithString:self.messageFrame.message.url]];
     }
     return NO;
 }

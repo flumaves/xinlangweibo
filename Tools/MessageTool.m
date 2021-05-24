@@ -28,7 +28,7 @@
 
 
 #pragma mark - 获取存储的路径
-//浏览历史
+///浏览历史
 - (NSString *)getHistoryPath {
     NSString *string = [NSString stringWithFormat:@"%@_history.archive",self.account.uid];
     
@@ -43,7 +43,7 @@
     return path;
 }
 
-//我的发表
+///我的发表
 - (NSString *)getLaunchPath {
     NSString *string = [NSString stringWithFormat:@"%@_launch.archive",self.account.uid];
     
@@ -58,7 +58,7 @@
     return path;
 }
 
-//我的收藏
+///我的收藏
 - (NSString *)getLikePath {
     NSString *string = [NSString stringWithFormat:@"%@_like.archive",self.account.uid];
     
@@ -233,13 +233,39 @@
 }
 
 
-#pragma mark - 照片的存储
-+ (void)saveImage:(NSData *)data {
-    [data writeToFile:IMAGEPATH atomically:YES];
+#pragma mark - 照片的存储 读取
+- (NSString *)saveImageWithData:(NSData *)data {
+    //获取路径
+    //获取当前的时间戳 作为图片的标识
+    NSTimeInterval currentTime = [[NSDate date] timeIntervalSince1970];
     
+    NSString *string = [NSString stringWithFormat:@"%@_%f_img.archive",self.account.uid, currentTime];
+    
+    NSString *path = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:string];
+    
+    [data writeToFile:path atomically:YES];
+  
+    //返回string 存储到message中 (每次运行沙盒路径都会改变，所以只存储string 读取的时候重新获得documen的路径 拼接上这个路径)
+    return string;
 }
 
-+ (NSURL *)getImageURL {
-    return [NSURL URLWithString:IMAGEPATH];
++ (NSString *)saveImageWithData:(NSData *)data {
+    MessageTool *tool = [[MessageTool alloc] init];
+    NSString *path = [tool saveImageWithData:data];
+    return path;
+}
+
+- (NSData *)getImageDataWithUrlString:(NSString *)urlString {
+    //拼接路径
+    NSString *path = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:urlString];
+    
+    NSData *data = [NSData dataWithContentsOfFile:path];
+    return data;
+}
+
++ (NSData *)getImageDataWithURLString:(NSString *)urlString {
+    MessageTool *tool = [[MessageTool alloc] init];
+    NSData *data = [tool getImageDataWithUrlString:urlString];
+    return data;
 }
 @end

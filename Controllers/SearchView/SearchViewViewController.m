@@ -13,7 +13,7 @@
 #import "WeiboMessageFrame.h"
 
 
-@interface SearchViewViewController () <UISearchBarDelegate,UITableViewDataSource,UITableViewDelegate,MessageCellDelegate>
+@interface SearchViewViewController () <UISearchBarDelegate,UITableViewDataSource,UITableViewDelegate>
 
 //搜索栏
 @property (nonatomic, strong)UISearchBar *searchBar;
@@ -45,6 +45,14 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [self addObservers];
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [self removeObservers];
 }
 
 #pragma mark - 数据的懒加载
@@ -306,11 +314,21 @@
     [self showResultsWithText:_searchBar.text];
 }
 
+
 #pragma mark - tableView的delegat和datasource
+//cell被点击
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-    
-    [center postNotificationName:@"addHistory" object:self];
+    WeiboMessage *message = [[WeiboMessage alloc] init];
+    if ([self isSearching]) {
+        WeiboMessageFrame *frame = self.resultFrameArray[indexPath.section];
+        message = frame.message;
+    } else {
+        WeiboMessageFrame *frame = self.messageFrameArray[indexPath.section];
+        message = frame.message;
+    }
+    //发送通知，添加到浏览历史中
+    [center postNotificationName:@"saveHistoryMessage" object:message];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -356,7 +374,6 @@
         cell = [[MessageCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:ID];
         //选中时不改变状态
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
-        cell.delegate = self;
     }
     
     [cell loadCellWithMessageFrame:messageFrame];
@@ -381,6 +398,7 @@
     }
     [self.searchBar resignFirstResponder];
 }
+
 
 #pragma mark - searchBar 的模糊搜索
 //拼音 首字母
@@ -409,44 +427,62 @@
     return allString;
 }
 
+#pragma mark - 添加观察者
+- (void)addObservers {
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+    //接收收藏微博
+    [center addObserver:self selector:@selector(addLikeMessage:) name:@"addLikeMessage" object:nil];
+    //接收取消收藏微博
+    [center addObserver:self selector:@selector(deleteLikeMessage:) name:@"deleteLikeMessage" object:nil];
+    [center addObserver:self selector:@selector(openUrl:) name:@"openUrl" object:nil];
+}
 
-#pragma mark - cell的delegate
+//收藏微博
+- (void)addLikeMessage:(NSNotification *)notification {
+    WeiboMessage *message = notification.object;
+    
+    [self.likeMessageArray insertObject:message atIndex:0]; //使最新收藏的微博显示在最上面
+    
+    [MessageTool saveLikeMessage:_likeMessageArray];
+    
+    //发送通知，添加到浏览历史中
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+    [center postNotificationName:@"saveHistoryMessage" object:message];
+}
+
+//取消收藏微博
+- (void)deleteLikeMessage:(NSNotification *)notification {
+    WeiboMessage *message = notification.object;
+    [self.likeMessageArray removeObject:message];
+    [MessageTool saveLikeMessage:_likeMessageArray];
+
+    //发送通知，添加到浏览历史中
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+    [center postNotificationName:@"saveHistoryMessage" object:message];
+}
+
 //打开文字链接的网址
-- (void)openUrl:(NSURL *)URL {
+- (void)openUrl:(NSNotification *)notification {
+    NSURL *url = notification.object;
+    
     WebViewController *webViewController = [[WebViewController alloc] init];
     
-    CGFloat viewX = 0;
-    CGFloat viewY = self.searchBar.bounds.origin.y;
-    CGFloat viewW = [UIScreen mainScreen].bounds.size.width;
-    CGFloat viewH = [UIScreen mainScreen].bounds.size.height - viewY;
-    
-    webViewController.view.bounds = CGRectMake(viewX, viewY, viewW, viewH);
+    webViewController.view.bounds = self.view.bounds;
     webViewController.navigationItem.leftBarButtonItem.tintColor = [UIColor orangeColor];
     
-    [webViewController loadWebViewWithUrl:URL];
+    [webViewController loadWebViewWithUrl:url];
     
     [self.navigationController pushViewController:webViewController animated:YES];
 }
 
-//添加微博到收藏
-- (void)addLikeMessageWithMessage:(WeiboMessage *)message {
-    [self.likeMessageArray insertObject:message atIndex:0]; //使最新收藏的微博显示在最上面
 
-    [MessageTool saveLikeMessage:_likeMessageArray];
-    //同时计入浏览记录
-    if ([self.delegate respondsToSelector:@selector(addHistoryMessageArrayWithMessage:)]) {
-        [self.delegate addHistoryMessageArrayWithMessage:message];
-    }
+#pragma mark - 注销观察者
+- (void)removeObservers {
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+    
+    [center removeObserver:self name:@"addLikeMessage" object:nil];
+    [center removeObserver:self name:@"deleteLikeMessage" object:nil];
+    [center removeObserver:self name:@"openUrl" object:nil];
 }
 
-//删除收藏的微博
-- (void)deleteLikeMessageWithMessage:(WeiboMessage *)message {
-    [self.likeMessageArray removeObject:message];
-
-    [MessageTool saveLikeMessage:_likeMessageArray];
-    //同时计入浏览记录
-    if ([self.delegate respondsToSelector:@selector(addHistoryMessageArrayWithMessage:)]) {
-        [self.delegate addHistoryMessageArrayWithMessage:message];
-    }
-}
 @end

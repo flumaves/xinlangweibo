@@ -11,7 +11,7 @@
 #import "MessageCell.h"
 #import "MessageTool.h"
 
-@interface StatusTableViewController () <MessageCellDelegate>
+@interface StatusTableViewController ()
 
 @property (nonatomic, strong)NSMutableArray *messageFrameArray;
 
@@ -30,9 +30,15 @@
     [super viewDidLoad];
     
     self.tableView.tableFooterView = [UIView new];
-    self.navigationItem.leftBarButtonItem.tintColor = [UIColor orangeColor];
 }
 
+- (void)viewWillAppear:(BOOL)animated {
+    [self addObservers];
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [self removeObservers];
+}
 
 //收藏的微博
 //用于判断加载的微博中是否拥有已经收藏的微博
@@ -107,35 +113,88 @@
         cell = [[MessageCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:ID];
         //选中时不改变状态
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
-        //代理执行点击文字链接 跳转页面
-        cell.delegate = self;
     }
     
     [cell loadCellWithMessageFrame:messageFrame];
     
     return cell;
 }
+//cell被点击
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+    WeiboMessageFrame *frame = self.messageFrameArray[indexPath.section];
+    WeiboMessage *message = frame.message;
+    
+    //发送通知，添加到浏览历史中
+    [center postNotificationName:@"saveHistoryMessage" object:message];
+}
 
-//cell的代理方法
-- (void)openUrl:(NSURL *)URL {
+#pragma mark - 添加观察者
+- (void)addObservers {
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+    //接收收藏微博
+    [center addObserver:self selector:@selector(addLikeMessage:) name:@"addLikeMessage" object:nil];
+    //接收取消收藏微博
+    [center addObserver:self selector:@selector(deleteLikeMessage:) name:@"deleteLikeMessage" object:nil];
+    [center addObserver:self selector:@selector(openUrl:) name:@"openUrl" object:nil];
+}
+
+//收藏微博
+- (void)addLikeMessage:(NSNotification *)notification {
+    NSLog(@"1");
+    
+    WeiboMessage *message = notification.object;
+    
+    [self.likeMessageArray insertObject:message atIndex:0]; //使最新收藏的微博显示在最上面
+    
+    [MessageTool saveLikeMessage:_likeMessageArray];
+    
+    //发送通知，添加到浏览历史中
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+    [center postNotificationName:@"saveHistoryMessage" object:message];
+}
+
+//取消收藏微博
+- (void)deleteLikeMessage:(NSNotification *)notification {
+    WeiboMessage *message = notification.object;
+    
+    NSArray *array = [NSArray arrayWithArray:self.likeMessageArray];
+    for (WeiboMessage *status in array) {
+        if ([status.ID isEqual:message.ID]) {
+            [_likeMessageArray removeObject:status];
+        }
+    }
+
+    [MessageTool saveLikeMessage:_likeMessageArray];
+
+    //发送通知，添加到浏览历史中
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+    [center postNotificationName:@"saveHistoryMessage" object:message];
+}
+
+//打开文字链接的网址
+- (void)openUrl:(NSNotification *)notification {
+    NSURL *url = notification.object;
+    
     WebViewController *webViewController = [[WebViewController alloc] init];
-    [webViewController loadWebViewWithUrl:URL];
+    
+    webViewController.view.bounds = self.view.bounds;
+    webViewController.navigationItem.leftBarButtonItem.tintColor = [UIColor orangeColor];
+    
+    [webViewController loadWebViewWithUrl:url];
     
     [self.navigationController pushViewController:webViewController animated:YES];
 }
 
-//添加微博到收藏
-- (void)addLikeMessageWithMessage:(WeiboMessage *)message {
-    [self.likeMessageArray insertObject:message atIndex:0]; //使最新收藏的微博显示在最上面
+
+#pragma mark - 注销观察者
+- (void)removeObservers {
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
     
-    [MessageTool saveLikeMessage:_likeMessageArray];
+    [center removeObserver:self name:@"addLikeMessage" object:nil];
+    [center removeObserver:self name:@"deleteLikeMessage" object:nil];
+    [center removeObserver:self name:@"openUrl" object:nil];
 }
 
-//删除收藏的微博
-- (void)deleteLikeMessageWithMessage:(WeiboMessage *)message {
-    [self.likeMessageArray removeObject:message];
-    
-    [MessageTool saveLikeMessage:_likeMessageArray];
-}
 
 @end

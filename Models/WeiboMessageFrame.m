@@ -72,7 +72,7 @@
         
         _imgView_frame = CGRectMake(imgViewX, imgViewY, imgViewW, imgViewH);
     } else {    //只有一张图片
-        if (_message.thumbnail_pic.length > 0) {
+        if (_message.original_pic.length > 0) {
             CGFloat thumbnailImgW = 300;
             CGFloat thumbnailImgH = 300;
             CGFloat thumbnailImgX = magin;
@@ -90,7 +90,7 @@
     if (_message.pic_urls.count > 1) {  //多图
         lblY = CGRectGetMaxY(_imgView_frame) + magin;
     } else {                            //单图
-        if (_message.thumbnail_pic.length > 0) {
+        if (_message.original_pic.length > 0) {
             lblY = CGRectGetMaxY(_thumbnail_pic_frame) +magin;
         } else {                        //无图
             lblY = CGRectGetMaxY(_text_View_frame);

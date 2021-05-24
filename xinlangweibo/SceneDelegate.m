@@ -76,9 +76,6 @@
         _personTableViewController = [[PersonTableViewController alloc] init];
         [self tabBar:tabBar addChildViewController: _personTableViewController withTitle:@"个人" withImage:@"个人"];
         
-        //设置控制器间的代理对象
-        _homeTableViewController.delegate = _personTableViewController;
-        
         self.window.rootViewController = tabBar;
     } else {           //如果不存在账户 加载访客视图 进行登陆
         VisitorViewController *visitorViewController = [[VisitorViewController alloc] init];

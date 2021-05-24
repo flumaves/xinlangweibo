@@ -10,7 +10,7 @@
 #import "HomeTableViewController.h"
 #import "MessageTool.h"
 
-@interface PersonTableViewController () <HomeTableViewControllerDelegate>
+@interface PersonTableViewController ()
 
 //浏览过的微博的数组
 @property (nonatomic, strong)NSMutableArray *historyStatusArray;
@@ -33,10 +33,14 @@
     self.tableView = tableView;
 }
 
-- (void)addHistory {
-    NSLog(@"%s",__func__);
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveHistoryMessage:) name:@"saveHistoryMessage" object:nil];
+    }
+    return self;
 }
-
 
 #pragma mark - Table view data source
 //静态单元格
@@ -125,6 +129,22 @@
     }
     return _likeStatusArray;
 }
+
+#pragma mark - 通知的具体实现
+- (void)saveHistoryMessage:(NSNotification *)notification {
+    WeiboMessage *message = notification.object;
+    
+    NSArray *array = [NSArray arrayWithArray:self.historyStatusArray];
+    for (WeiboMessage *status in array) {
+        if ([status.ID isEqual:message.ID]) {         //已经浏览过的weibo
+            [_historyStatusArray removeObject:status];  //把微博删除
+        }
+    }
+    
+    [self.historyStatusArray insertObject:message atIndex:0];   //插入到数组头部 使最新的浏览记录在最前面
+    [MessageTool saveHistoryMessage:self.historyStatusArray];
+}
+
 
 #pragma mark - HomeTableViewController delegate
 - (void)addHistoryMessageArrayWithMessage:(WeiboMessage *)message {

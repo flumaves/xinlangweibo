@@ -15,7 +15,7 @@
 #import "UserAccountTool.h"
 #import "UserAccount.h"
 
-@interface HomeTableViewController () <MessageCellDelegate,UISearchBarDelegate>
+@interface HomeTableViewController () <UISearchBarDelegate>
 
 //微博模型数组，frame模型中包含对应的微博数据
 @property (nonatomic, strong)NSMutableArray *messageFrameArray;
@@ -43,7 +43,81 @@
     self.tableView.tableFooterView = [UIView new];
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
+    
+  
 }
+
+//将要展示view的时候
+- (void)viewWillAppear:(BOOL)animated {
+    [self addObservers];
+}
+
+//view不显示的时候注销观察者
+- (void)viewWillDisappear:(BOOL)animated {
+    [self removeObservers];
+}
+
+#pragma mark - 添加观察者
+- (void)addObservers {
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+    //接收收藏微博
+    [center addObserver:self selector:@selector(addLikeMessage:) name:@"addLikeMessage" object:nil];
+    //接收取消收藏微博
+    [center addObserver:self selector:@selector(deleteLikeMessage:) name:@"deleteLikeMessage" object:nil];
+    //跳转网页
+    [center addObserver:self selector:@selector(openUrl:) name:@"openUrl" object:nil];
+}
+
+//收藏微博
+- (void)addLikeMessage:(NSNotification *)notification {
+    NSLog(@"2");
+    
+    WeiboMessage *message = notification.object;
+    
+    [self.likeMessageArray insertObject:message atIndex:0]; //使最新收藏的微博显示在最上面
+    
+    [MessageTool saveLikeMessage:_likeMessageArray];
+    
+    //发送通知，添加到浏览历史中
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+    [center postNotificationName:@"saveHistoryMessage" object:message];
+}
+
+//取消收藏微博
+- (void)deleteLikeMessage:(NSNotification *)notification {
+    WeiboMessage *message = notification.object;
+    [self.likeMessageArray removeObject:message];
+    [MessageTool saveLikeMessage:_likeMessageArray];
+
+    //发送通知，添加到浏览历史中
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+    [center postNotificationName:@"saveHistoryMessage" object:message];
+}
+
+//打开文字链接的网址
+- (void)openUrl:(NSNotification *)notification {
+    NSURL *url = notification.object;
+    
+    WebViewController *webViewController = [[WebViewController alloc] init];
+    
+    webViewController.view.bounds = self.view.bounds;
+    webViewController.navigationItem.leftBarButtonItem.tintColor = [UIColor orangeColor];
+    
+    [webViewController loadWebViewWithUrl:url];
+    
+    [self.navigationController pushViewController:webViewController animated:YES];
+}
+
+
+#pragma mark - 注销观察者
+- (void)removeObservers {
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+    
+    [center removeObserver:self name:@"addLikeMessage" object:nil];
+    [center removeObserver:self name:@"deleteLikeMessage" object:nil];
+    [center removeObserver:self name:@"openUrl" object:nil];
+}
+
 
 #pragma mark - 检测tableview的偏移量
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
@@ -224,15 +298,6 @@
 
 #pragma mark - 加载子控件
 - (void)loadSubViews {
-//    //searchBar
-//    CGFloat searchBarW = [UIScreen mainScreen].bounds.size.width;
-//    CGFloat searchBarH = 56;
-//    _searchBar = [[UISearchBar alloc] initWithFrame:CGRectMake(0, 0, searchBarW, searchBarH)];
-//    [_searchBar setPlaceholder:@"搜索"];
-//    _searchBar.delegate = self;
-//    _searchBar.barStyle = UIBarStyleDefault;
-//    self.tableView.tableHeaderView = _searchBar;
-//
     //leftBarButton
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSearch target:self action:@selector(searchMessage)];
     self.navigationItem.leftBarButtonItem.tintColor = [UIColor orangeColor];
@@ -259,15 +324,14 @@
     } else return 200;
 }
 
-///cell被点击
+//cell被点击
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    //获取当前点击的message数据
-    WeiboMessageFrame *messageFrame = self.messageFrameArray[indexPath.section];
-    WeiboMessage *message = messageFrame.message;
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+    WeiboMessageFrame *frame = self.messageFrameArray[indexPath.section];
+    WeiboMessage *message = frame.message;
     
-    if ([self.delegate respondsToSelector:@selector(addHistoryMessageArrayWithMessage:)]) {
-        [self.delegate addHistoryMessageArrayWithMessage:message];
-    }
+    //发送通知，添加到浏览历史中
+    [center postNotificationName:@"saveHistoryMessage" object:message];
 }
 
 
@@ -284,7 +348,6 @@
         cell = [[MessageCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:ID];
         //选中时不改变状态
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
-        cell.delegate = self;
     }
     
     [cell loadCellWithMessageFrame:messageFrame];
@@ -309,42 +372,6 @@
     [self.tableView scrollsToTop];
     
     [self loadWeiboMessageWithAccess_token:self.account.access_token];
-}
-
-
-#pragma mark - cell的delegate
-//打开文字链接的网址
-- (void)openUrl:(NSURL *)URL {
-    WebViewController *webViewController = [[WebViewController alloc] init];
-    
-    webViewController.view.bounds = self.view.bounds;
-    webViewController.navigationItem.leftBarButtonItem.tintColor = [UIColor orangeColor];
-    
-    [webViewController loadWebViewWithUrl:URL];
-    
-    [self.navigationController pushViewController:webViewController animated:YES];
-}
-
-//添加微博到收藏
-- (void)addLikeMessageWithMessage:(WeiboMessage *)message {
-    [self.likeMessageArray insertObject:message atIndex:0]; //使最新收藏的微博显示在最上面
-    
-    [MessageTool saveLikeMessage:_likeMessageArray];
-    //同时计入浏览记录
-    if ([self.delegate respondsToSelector:@selector(addHistoryMessageArrayWithMessage:)]) {
-        [self.delegate addHistoryMessageArrayWithMessage:message];
-    }
-}
-
-//删除收藏的微博
-- (void)deleteLikeMessageWithMessage:(WeiboMessage *)message {
-    [self.likeMessageArray removeObject:message];
-    
-    [MessageTool saveLikeMessage:_likeMessageArray];
-    //同时计入浏览记录
-    if ([self.delegate respondsToSelector:@selector(addHistoryMessageArrayWithMessage:)]) {
-        [self.delegate addHistoryMessageArrayWithMessage:message];
-    }
 }
 
 @end

@@ -80,6 +80,8 @@
             @"user" : [_model dictionaryWithValuesForKeys:@[@"screen_name", @"profile_image_url"]],
             @"pic_urls" : [NSDictionary dictionaryWithObjects:@[@""] forKeys:@[@"pic_urls"]],
             @"original_pic" : _original_pic_url ? _original_pic_url : nil,
+            @"thumbnail_pic" : _original_pic_url ? _original_pic_url : nil,
+            @"bmiddle_pic" : _original_pic_url ? _original_pic_url : nil,
             @"likeMessage" : @"NO"
         };
         dictionary = dict;
@@ -109,6 +111,8 @@
 //清除页面的编辑内容
 - (void)cleanTheEdit {
     self.textView.text = @"";
+    
+    [_addImgBtn setImage: [UIImage imageNamed:@"add"] forState:UIControlStateNormal];
     
     self.navigationItem.rightBarButtonItem.enabled = NO;
     
@@ -265,7 +269,7 @@
     [self.textView resignFirstResponder];
 }
 
-////选择完图片对应的代理方法
+#pragma mark - 选择完图片对应的代理方法
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey, id> *)info {
     NSString *type = [info objectForKey:UIImagePickerControllerMediaType];
     
@@ -278,9 +282,9 @@
 
         NSData *data = [NSData dataWithContentsOfFile:imgUrl.path];
         
-        [MessageTool saveImage:data];
+        NSString *url = [MessageTool saveImageWithData:data];
         
-        _original_pic_url = [MessageTool getImageURL].path;
+        _original_pic_url = url;
     }
     [self dismissViewControllerAnimated:YES completion:nil];
 }
