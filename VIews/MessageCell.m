@@ -8,17 +8,6 @@
 #import "MessageCell.h"
 #import "MessageTool.h"
 
-//获取图片的block
-UIImage *(^getImgBlock)(NSString *) = ^(NSString *urlString){
-    NSURL *url = [NSURL URLWithString:urlString];
-    
-    NSData *imgData = [NSData dataWithContentsOfURL:url];
-    
-    UIImage *img = [UIImage imageWithData:imgData];
-    
-    return img;
-};
-
 @interface MessageCell () <UITextViewDelegate>
 //是否为收藏的微博
 @property (nonatomic, strong)NSString *likeMessage;
@@ -53,9 +42,20 @@ UIImage *(^getImgBlock)(NSString *) = ^(NSString *urlString){
 //多组图片的view
 @property (nonatomic, strong)UIView *imgView;
 
+//储存多图的数组
+@property (nonatomic, strong)NSMutableArray *imgArray;
+
 @end
 
 @implementation MessageCell
+
+- (NSMutableArray *)imgArray {
+    if (_imgArray == nil) {
+        _imgArray = [[NSMutableArray alloc] init];
+    }
+    return _imgArray;
+}
+
 
 #pragma mark  初始化控件
 - (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
@@ -115,9 +115,28 @@ UIImage *(^getImgBlock)(NSString *) = ^(NSString *urlString){
         _thumbnail_pic.clipsToBounds = YES;
         [self.contentView addSubview:_thumbnail_pic];
         
-        //多组图片
+        //多组图片的view
         _imgView = [[UIView alloc] init];
         [self.contentView addSubview:_imgView];
+        
+        //添加图片到view中
+        CGFloat magin = 10;     //控件间的间隙
+        CGFloat imgMagin = 5;   //图片之间的间隙
+        CGFloat imgL = ([UIScreen mainScreen].bounds.size.width - 2 * (imgMagin + magin)) / 3;
+        int columns = 3; //确定每一行有三张图片
+        int max_img = 9;        //最多加载九张图片
+        for (int i = 0; i < max_img; i++) {
+            CGFloat imgX = (imgMagin + imgL) * (i % columns);
+            CGFloat imgY = (imgMagin + imgL) * (i / columns);
+            
+            UIImageView *imgView = [[UIImageView alloc] initWithFrame:CGRectMake(imgX, imgY, imgL, imgL)];
+            imgView.contentMode = UIViewContentModeScaleAspectFill;
+            imgView.clipsToBounds = YES;
+            imgView.tag = i;
+            
+            [self.imgArray addObject:imgView];  //把添加的imgView储存到数组中
+            [self.imgView addSubview:imgView];
+        }
     }
     return self;
 }
@@ -180,27 +199,26 @@ UIImage *(^getImgBlock)(NSString *) = ^(NSString *urlString){
         
         //请求图片
         dispatch_async(dispatch_get_global_queue(0, 0), ^{
-            CGFloat imgMagin = 5;   //图片之间的间隙
-            CGFloat imgL = (self.messageFrame.imgView_frame.size.width - 2 * imgMagin) / 3;
-            int columns = 3; //确定每一行有三张图片
-            for (int i = 0; i< self.messageFrame.message.pic_urls.count; i++) {
-                CGFloat imgX = (imgMagin + imgL) * (i % columns);
-                CGFloat imgY = (imgMagin + imgL) * (i / columns);
+            for (int i = 0; i < self.imgArray.count; i++) {
+                UIImageView *imgView = self.imgArray[i];
+                if (i < self.messageFrame.message.pic_urls.count) { //判断是否需要显示照片
+                    //判断imgView的编号 获取对应位置的图片
+                    NSDictionary *dict = self.messageFrame.message.pic_urls[i];
+                    NSString *urlString = dict[@"thumbnail_pic"];
+                    
+                    NSURL *url = [NSURL URLWithString:urlString];
+                    NSData *imgData = [NSData dataWithContentsOfURL:url];
                 
-                NSDictionary *dict = self.messageFrame.message.pic_urls[i];
-                NSString *urlString = dict[@"thumbnail_pic"];
-
-                NSURL *url = [NSURL URLWithString:urlString];
-                NSData *imgData = [NSData dataWithContentsOfURL:url];
-
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    UIImageView *imgView = [[UIImageView alloc] initWithFrame:CGRectMake(imgX, imgY, imgL, imgL)];
-                    imgView.contentMode = UIViewContentModeScaleAspectFill;
-                    imgView.clipsToBounds = YES;
-                        
-                    imgView.image = [UIImage imageWithData:imgData];
-                    [self.imgView addSubview:imgView];
-                });
+                    dispatch_sync(dispatch_get_main_queue(), ^{
+                        imgView.image = [UIImage imageWithData:imgData];
+                    });
+                    
+                } else {
+                    //不需要显示图片 隐藏imgView
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        imgView.hidden = YES;
+                    });
+                }
             }
         });
     } else {

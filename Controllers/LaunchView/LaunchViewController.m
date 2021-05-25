@@ -52,7 +52,7 @@
 
 
 #pragma mark - 发布微博
-- (void)launchWeibo {
+- (void)launchWeiboBtnClick {
     if (_textView.text.length > 140) {
         NSLog(@"字数超过140");
         return;
@@ -67,9 +67,13 @@
     //我的发表数组
     NSMutableArray *launchMessageArray = [MessageTool launchMessageArray];
     
-    //储存在本地
+    // 无法调用api发布
     NSDictionary *dictionary = [NSDictionary dictionary];
     if (_original_pic_url.length > 0) { //有上传照片
+        if (_textView.text.length < 1) {    //没有文字 填充@“分享图片”
+            _textView.text = @"分享图片";
+        }
+        
         NSDictionary *dict = @{
             @"text" : _textView.text,
             @"id" : [[NSNumber alloc] initWithDouble:launchMessageArray.count + 1],
@@ -113,6 +117,8 @@
     self.textView.text = @"";
     
     [_addImgBtn setImage: [UIImage imageNamed:@"add"] forState:UIControlStateNormal];
+    
+    _original_pic_url = @""; //需要清空储存的url 防止下次发微博没图片 但暂存的url存在
     
     self.navigationItem.rightBarButtonItem.enabled = NO;
     
@@ -222,7 +228,7 @@
     _placeHolderLbl = [[UILabel alloc] initWithFrame:CGRectMake(lblX, lblY, lblW, lblH)];
     _placeHolderLbl.font = [UIFont systemFontOfSize:17];
     _placeHolderLbl.textColor = [UIColor grayColor];
-    _placeHolderLbl.text = @"说点什么...";
+    _placeHolderLbl.text = @"分享新鲜事...";
     
     [self.textView addSubview:_placeHolderLbl];
     
@@ -236,19 +242,19 @@
     _addImgBtn.layer.borderColor = [[UIColor grayColor] CGColor];
     [_addImgBtn setImage: [UIImage imageNamed:@"add"] forState:UIControlStateNormal];
     _addImgBtn.backgroundColor = [UIColor colorWithRed:245 / 255.0 green:245 / 255.0 blue:245 / 255.0 alpha:1];
-    [_addImgBtn addTarget:self action:@selector(addImage) forControlEvents:UIControlEventTouchUpInside];
+    [_addImgBtn addTarget:self action:@selector(addImageBtnClick) forControlEvents:UIControlEventTouchUpInside];
     _addImgBtn.hidden = NO;
     
     [self.view addSubview:_addImgBtn];
 
     //发布按钮
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"发布" style:UIBarButtonItemStylePlain target:self action:@selector(launchWeibo)];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"发布" style:UIBarButtonItemStylePlain target:self action:@selector(launchWeiboBtnClick)];
     self.navigationItem.rightBarButtonItem.tintColor = [UIColor orangeColor];
     self.navigationItem.rightBarButtonItem.enabled = NO;
 }
 
 //点击添加图片
-- (void)addImage {
+- (void)addImageBtnClick {
     //创建对象
     UIImagePickerController *imgPicker = [[UIImagePickerController alloc] init];
     
@@ -287,6 +293,9 @@
         _original_pic_url = url;
     }
     [self dismissViewControllerAnimated:YES completion:nil];
+    
+    //当选择了图片，没有文字 也可以发表 自动填充@“分享照片”
+    self.navigationItem.rightBarButtonItem.enabled = YES;
 }
 
 @end
