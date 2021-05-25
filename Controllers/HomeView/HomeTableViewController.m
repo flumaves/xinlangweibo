@@ -338,7 +338,7 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     WeiboMessageFrame *messageFrame = [[WeiboMessageFrame alloc] init];
     
-    messageFrame = _messageFrameArray[indexPath.section];
+    messageFrame = self.messageFrameArray[indexPath.section];
 
     NSString *ID = @"message";
     

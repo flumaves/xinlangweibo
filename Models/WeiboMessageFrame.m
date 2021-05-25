@@ -68,7 +68,7 @@
         CGFloat imgViewW = [UIScreen mainScreen].bounds.size.width - 2 * magin;
         //单个小相片的宽度
         CGFloat imgW = (imgViewW - 2 * imgMagin) / 3;
-        CGFloat imgViewH = (_message.pic_urls.count / 3) * (imgW + imgMagin) + imgW;
+        CGFloat imgViewH = ((_message.pic_urls.count - 1) / 3) * (imgW + imgMagin) + imgW;
         
         _imgView_frame = CGRectMake(imgViewX, imgViewY, imgViewW, imgViewH);
     } else {    //只有一张图片
@@ -81,13 +81,79 @@
         }
     }
     
+    ///转发微博部分
+    if (_message.retweeted_status != nil) {
+        //转化成微博的模型
+        WeiboMessage *message = [[WeiboMessage alloc] initWithDictionary:_message.retweeted_status];
+        
+        //用户的昵称
+        CGFloat nameLblX = magin;
+        CGFloat nameLblY = magin;
+        CGFloat nameLblW = 200;
+        CGFloat nameLblH = 20;
+        _REscreen_name_Lbl_frame = CGRectMake(nameLblX, nameLblY, nameLblW, nameLblH);
+        
+        //正文
+        CGFloat textX = magin;
+        CGFloat textY = CGRectGetMaxY(_REscreen_name_Lbl_frame) + magin;
+        
+            //计算text的行高
+        NSString *text = message.subText;
+        
+        CGSize textSize = [text boundingRectWithSize:CGSizeMake([UIScreen mainScreen].bounds.size.width - 2 * magin, [UIScreen mainScreen].bounds.size.height * 10) options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName: TEXTFONT} context:nil].size;
+     
+        _REtext_View_frame = CGRectMake(textX - 5, textY, textSize.width + 3 + 10, textSize.height + 21);  //预留一行的空间
+        
+        //缩略图
+        if (message.pic_urls.count > 1) {  //多图
+            CGFloat imgMagin = 5;   //照片的间距
+            CGFloat imgViewX = magin;
+            CGFloat imgViewY = CGRectGetMaxY(_REtext_View_frame);
+            CGFloat imgViewW = [UIScreen mainScreen].bounds.size.width - 2 * magin;
+            //单个小相片的宽度
+            CGFloat imgW = (imgViewW - 2 * imgMagin) / 3;
+            CGFloat imgViewH = ((message.pic_urls.count - 1) / 3) * (imgW + imgMagin) + imgW;
+            
+            _REimgView_frame = CGRectMake(imgViewX, imgViewY, imgViewW, imgViewH);
+        } else {    //只有一张图片
+            if (message.original_pic.length > 0) {
+                CGFloat thumbnailImgW = 300;
+                CGFloat thumbnailImgH = 300;
+                CGFloat thumbnailImgX = magin;
+                CGFloat thumbnailImgY = CGRectGetMaxY(_REtext_View_frame) + magin;
+                _REthumbnail_pic_frame = CGRectMake(thumbnailImgX, thumbnailImgY, thumbnailImgW, thumbnailImgH);
+            }
+        }
+        
+        //返回转发微博view的frame
+        CGFloat viewH = 0;
+        CGFloat viewW = [UIScreen mainScreen].bounds.size.width;
+        CGFloat viewX = 0;
+        CGFloat viewY = CGRectGetMaxY(_text_View_frame);
+        
+        if (message.pic_urls.count > 1) {  //多图
+            viewH = CGRectGetMaxY(_REimgView_frame) + magin;
+        } else {                            //单图
+            if (message.original_pic.length > 0) {
+                viewH = CGRectGetMaxY(_REthumbnail_pic_frame) +magin;
+            } else {                        //无图
+                viewH = CGRectGetMaxY(_REtext_View_frame);
+            }
+        }
+        
+        _retweeted_status_frame = CGRectMake(viewX, viewY, viewW, viewH);
+    }
+    
     
     //底下三个控件统一宽度    高度  Y
     CGFloat lblW = [UIScreen mainScreen].bounds.size.width / 4;
     CGFloat lblH = 30;
     CGFloat lblY;
     
-    if (_message.pic_urls.count > 1) {  //多图
+    if (_message.retweeted_status != nil) {
+        //是转发的微博
+        lblY = CGRectGetMaxY(_retweeted_status_frame);
+    } else if (_message.pic_urls.count > 1) {  //多图
         lblY = CGRectGetMaxY(_imgView_frame) + magin;
     } else {                            //单图
         if (_message.original_pic.length > 0) {

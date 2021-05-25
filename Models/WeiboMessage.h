@@ -63,7 +63,8 @@ NS_ASSUME_NONNULL_BEGIN
 //微博配图ID。多图时返回多图ID
 @property (nonatomic, strong)NSMutableArray *pic_urls;
 
-//
+//转发微博
+@property (nonatomic, strong)NSDictionary *retweeted_status;
 
 - (instancetype)initWithDictionary:(NSDictionary *)dictionary;
 

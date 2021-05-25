@@ -45,6 +45,25 @@
 //储存多图的数组
 @property (nonatomic, strong)NSMutableArray *imgArray;
 
+#pragma mark - 转发微博部分 （加上RE前缀）
+//转发微博的view
+@property (nonatomic, strong)UIView *retweeted_status_View;
+
+//用户的昵称
+@property (nonatomic, strong)UILabel *REscreen_name_Lbl;
+
+//正文
+@property (nonatomic, strong)UITextView *REtext_View;
+
+//缩略图
+@property (nonatomic, strong)UIImageView *REthumbnail_pic;
+
+//多组图片的view
+@property (nonatomic, strong)UIView *REimgView;
+
+//储存多图的数组
+@property (nonatomic, strong)NSMutableArray *REimgArray;
+
 @end
 
 @implementation MessageCell
@@ -56,6 +75,12 @@
     return _imgArray;
 }
 
+- (NSMutableArray *)REimgArray {
+    if (_REimgArray == nil) {
+        _REimgArray = [[NSMutableArray alloc] init];
+    }
+    return _REimgArray;
+}
 
 #pragma mark  初始化控件
 - (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
@@ -63,7 +88,7 @@
 
         //顶部分割
         _topDividView = [[UIView alloc] init];
-        _topDividView.backgroundColor = [UIColor colorWithRed:245 / 255.0 green:245 / 255.0 blue:245 / 255.0 alpha:1];
+        _topDividView.backgroundColor = [UIColor colorWithRed:220 / 255.0 green:220 / 255.0 blue:220 / 255.0 alpha:1];
         [self.contentView addSubview:_topDividView];
         
         //用户头像
@@ -136,6 +161,54 @@
             
             [self.imgArray addObject:imgView];  //把添加的imgView储存到数组中
             [self.imgView addSubview:imgView];
+        }
+        
+        ///转发微博部分
+        _retweeted_status_View = [[UIView alloc] init];
+        _retweeted_status_View.backgroundColor = [UIColor colorWithRed:245 / 255.0 green:245 / 255.0 blue:245 / 255.0 alpha:1];
+        [self.contentView addSubview:_retweeted_status_View];
+        
+        //昵称
+        _REscreen_name_Lbl = [[UILabel alloc] init];
+        [self.retweeted_status_View addSubview:_REscreen_name_Lbl];
+        _REscreen_name_Lbl.textColor = [UIColor colorWithRed:65 / 255.0 green:105 / 255.0 blue:225 / 255.0 alpha:1];
+        
+        //正文
+        _REtext_View = [[UITextView alloc] init];
+        _REtext_View.editable = NO;
+        _REtext_View.scrollEnabled = NO;
+        _REtext_View.textContainerInset = UIEdgeInsetsMake(0, 0, 0, 0);
+        _REtext_View.delegate = self;
+        _REtext_View.backgroundColor = [UIColor colorWithRed:245 / 255.0 green:245 / 255.0 blue:245 / 255.0 alpha:1];
+        [self.retweeted_status_View addSubview:_REtext_View];
+        
+        //缩略图
+        _REthumbnail_pic = [[UIImageView alloc] init];
+        _REthumbnail_pic.contentMode = UIViewContentModeScaleAspectFill;
+        _REthumbnail_pic.clipsToBounds = YES;
+        [self.retweeted_status_View addSubview:_REthumbnail_pic];
+        
+        //多组图片的view
+        _REimgView = [[UIView alloc] init];
+        [self.retweeted_status_View addSubview:_REimgView];
+        
+        //添加图片到view中
+        CGFloat REmagin = 10;     //控件间的间隙
+        CGFloat REimgMagin = 5;   //图片之间的间隙
+        CGFloat REimgL = ([UIScreen mainScreen].bounds.size.width - 2 * (REimgMagin + REmagin)) / 3;
+        int REcolumns = 3; //确定每一行有三张图片
+        int REmax_img = 9;        //最多加载九张图片
+        for (int i = 0; i < REmax_img; i++) {
+            CGFloat REimgX = (imgMagin + REimgL) * (i % REcolumns);
+            CGFloat REimgY = (imgMagin + REimgL) * (i / REcolumns);
+            
+            UIImageView *REimgView = [[UIImageView alloc] initWithFrame:CGRectMake(REimgX, REimgY, REimgL, REimgL)];
+            REimgView.contentMode = UIViewContentModeScaleAspectFill;
+            REimgView.clipsToBounds = YES;
+            REimgView.tag = i;
+            
+            [self.REimgArray addObject:REimgView];  //把添加的imgView储存到数组中
+            [self.REimgView addSubview:REimgView];
         }
     }
     return self;
@@ -211,6 +284,7 @@
                 
                     dispatch_sync(dispatch_get_main_queue(), ^{
                         imgView.image = [UIImage imageWithData:imgData];
+                        imgView.hidden = NO;
                     });
                     
                 } else {
@@ -230,6 +304,75 @@
             _thumbnail_pic.hidden = NO;
             _imgView.hidden = YES;
             [self getThumbnailImgWithUrlString:messageFrame.message.original_pic];
+        }
+    }
+    
+    ///转发微博部分
+    //获取转发微博的模型
+    if (_messageFrame.message.retweeted_status == nil) {
+        //转发模块隐藏
+        _retweeted_status_View.hidden = YES;
+    } else {
+        _retweeted_status_View.hidden = NO;
+        
+        WeiboMessage *REmessage = [[WeiboMessage alloc] initWithDictionary:_messageFrame.message.retweeted_status];
+        
+        //整个转发模块
+        _retweeted_status_View.frame = messageFrame.retweeted_status_frame;
+        
+        //昵称
+        _REscreen_name_Lbl.frame = messageFrame.REscreen_name_Lbl_frame;
+        
+        NSString *screen_name = [NSString stringWithFormat:@"@%@:",REmessage.user.screen_name];
+        _REscreen_name_Lbl.text = screen_name;
+        
+        //正文
+        _REtext_View.frame = messageFrame.REtext_View_frame;
+        _REtext_View.text = REmessage.text;
+        _REtext_View.attributedText = REmessage.attr;
+        
+        //缩略图
+        if (REmessage.pic_urls.count > 1) {
+            _REimgView.frame = _messageFrame.REimgView_frame;
+            _REthumbnail_pic.hidden = YES;
+            _REimgView.hidden = NO;
+            
+            //请求图片
+            dispatch_async(dispatch_get_global_queue(0, 0), ^{
+                for (int i = 0; i < self.REimgArray.count; i++) {
+                    UIImageView *imgView = self.REimgArray[i];
+                    if (i < REmessage.pic_urls.count) { //判断是否需要显示照片
+                        
+                        //根据imgView的编号 获取对应位置的照片
+                        NSDictionary *dict = REmessage.pic_urls[i];
+                        NSString *urlString = dict[@"thumbnail_pic"];
+                        
+                        NSURL *url = [NSURL URLWithString:urlString];
+                        NSData *imgData = [NSData dataWithContentsOfURL:url];
+                    
+                        dispatch_sync(dispatch_get_main_queue(), ^{
+                            imgView.image = [UIImage imageWithData:imgData];
+                            imgView.hidden = NO;
+                        });
+                        
+                    } else {
+                        //不需要显示图片 隐藏imgView
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            imgView.hidden = YES;
+                        });
+                    }
+                }
+            });
+        } else {
+            _REthumbnail_pic.frame = messageFrame.REthumbnail_pic_frame;
+            if (REmessage.thumbnail_pic == NULL) {
+                _REthumbnail_pic.hidden = YES;
+                _REimgView.hidden = YES;
+            } else {
+                _REthumbnail_pic.hidden = NO;
+                _REimgView.hidden = YES;
+                [self getThumbnailImgWithUrlString:REmessage.original_pic];
+            }
         }
     }
 }

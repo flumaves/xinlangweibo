@@ -11,22 +11,23 @@
 
 - (instancetype)initWithDictionary:(NSDictionary *)dictionary {
     if (self = [super init]) {
-        self.ID              = dictionary[@"id"];
-        self.source          = dictionary[@"source"];
-        self.text            = dictionary[@"text"];
-        self.created_at      = dictionary[@"created_at"];
-        self.reposts_count   = dictionary[@"reposts_count"];
-        self.attitudes_count = dictionary[@"attitudes_count"];
-        self.comments_count  = dictionary[@"comments_count"];
-        self.user            = [UserModel userWithDictionary:dictionary[@"user"]];
-        self.thumbnail_pic   = dictionary[@"thumbnail_pic"];
-        self.bmiddle_pic     = dictionary[@"bmiddle_pic"];
-        self.original_pic    = dictionary[@"original_pic"];
-        self.pic_urls        = dictionary[@"pic_urls"];
-        self.url             = [self getOriginalUrl];
-        self.subText         = [self getSubText];
-        self.attr            = [self setAttributedString];
-        self.likeMessage     = dictionary[@"likeMessage"] ? dictionary[@"likeMessage"] : @"NO";  //网络请求的cell 传入的dictionar中没有likeMessage 则设置成@"NO"
+        self.ID               = dictionary[@"id"];
+        self.source           = dictionary[@"source"];
+        self.text             = dictionary[@"text"];
+        self.created_at       = dictionary[@"created_at"];
+        self.reposts_count    = dictionary[@"reposts_count"];
+        self.attitudes_count  = dictionary[@"attitudes_count"];
+        self.comments_count   = dictionary[@"comments_count"];
+        self.user             = [UserModel userWithDictionary:dictionary[@"user"]];
+        self.thumbnail_pic    = dictionary[@"thumbnail_pic"];
+        self.bmiddle_pic      = dictionary[@"bmiddle_pic"];
+        self.original_pic     = dictionary[@"original_pic"];
+        self.pic_urls         = dictionary[@"pic_urls"];
+        self.url              = [self getOriginalUrl];
+        self.subText          = [self getSubText];
+        self.attr             = [self setAttributedString];
+        self.likeMessage      = dictionary[@"likeMessage"] ? dictionary[@"likeMessage"] : @"NO"; //网络请求的cell 传入的dictionar中没有likeMessage 则设置成@"NO"
+        self.retweeted_status = dictionary[@"retweeted_status"];
     }
     return self;
 }
