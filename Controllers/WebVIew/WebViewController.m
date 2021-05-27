@@ -35,21 +35,4 @@
     [_webView loadRequest:request];
 }
 
-//- (void)webView:(WKWebView *)webView didStartProvisionalNavigation:(WKNavigation *)navigation {
-//    NSLog(@"%s",__func__);
-//}
-//
-//- (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
-//    NSLog(@"%s",__func__);
-//}
-//
-//- (void)webView:(WKWebView *)webView didFailNavigation:(WKNavigation *)navigation withError:(NSError *)error {
-//    NSLog(@"%s",__func__);
-//}
-//
-//- (void)webViewWebContentProcessDidTerminate:(WKWebView *)webView {
-//    NSLog(@"%s",__func__);
-//    [webView reload];
-//}
-
 @end

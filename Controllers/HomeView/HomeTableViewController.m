@@ -14,20 +14,24 @@
 #import "MessageTool.h"
 #import "UserAccountTool.h"
 #import "UserAccount.h"
+#import "HeadTabView.h"
 
 @interface HomeTableViewController () <UISearchBarDelegate>
 
 //微博模型数组，frame模型中包含对应的微博数据
 @property (nonatomic, strong)NSMutableArray *messageFrameArray;
 
+//显示到tableView中的数组
+@property (nonatomic, strong)NSMutableArray *showMessageFrameArray;
+
+//当前点击的headerTab中的btn的text
+@property (nonatomic, strong)NSString *btnText;
+
 //收藏的微博数组
 @property (nonatomic, strong)NSMutableArray *likeMessageArray;
 
 //登陆的账户
 @property (nonatomic, strong)UserAccount *account;
-
-//搜索栏
-@property (nonatomic, strong)UISearchBar *searchBar;
 
 @end
 
@@ -43,8 +47,6 @@
     self.tableView.tableFooterView = [UIView new];
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
-    
-  
 }
 
 //将要展示view的时候
@@ -66,6 +68,19 @@
     [center addObserver:self selector:@selector(deleteLikeMessage:) name:@"deleteLikeMessage" object:nil];
     //跳转网页
     [center addObserver:self selector:@selector(openUrl:) name:@"openUrl" object:nil];
+    //headerTab按钮点击
+    [center addObserver:self selector:@selector(showSpeciesMessage:) name:@"headerTabBtnClick" object:nil];
+}
+
+//显示特定种类的微博
+- (void)showSpeciesMessage:(NSNotification *)notification {
+    UIButton *btn = notification.object;
+    //记录所点击的btn 的text
+    _btnText = btn.titleLabel.text;
+    //更新将要显示的微博数组
+    [self updateShowMessageFrameArray];
+    //更新tableView
+    [self.tableView reloadData];
 }
 
 //收藏微博
@@ -145,12 +160,20 @@
     return _account;
 }
 
-//加载到tableView上的数据
+//加载的数据
 - (NSMutableArray *)messageFrameArray {
     if (_messageFrameArray == nil) {
         [self loadWeiboMessageWithAccess_token:self.account.access_token];
     }
     return _messageFrameArray;
+}
+
+//展示到tableView中的数据
+- (NSMutableArray *)showMessageFrameArray {
+    if (_showMessageFrameArray == nil) {
+        _showMessageFrameArray = [NSMutableArray array];
+    }
+    return _showMessageFrameArray;
 }
 
 //用于判断加载的微博中是否拥有已经收藏的微博
@@ -161,6 +184,13 @@
     return _likeMessageArray;
 }
    
+//当前点击的btn的text
+- (NSString *)btnText {
+    if (_btnText == nil) {
+        _btnText = @"全文";
+    }
+    return _btnText;
+}
 
 #pragma mark - 获取最新的微博数据
 - (void)loadWeiboMessageWithAccess_token:(NSString *)access_token {
@@ -215,8 +245,10 @@
             
             [messageFrameArray insertObject:messageFrame atIndex:0];
             }
-
+            //对微博数据存储 和 将要显示的数据存储
             self.messageFrameArray = messageFrameArray;
+            
+            [self updateShowMessageFrameArray];
             NSLog(@"网络请求完毕");
             
             dispatch_sync(dispatch_get_main_queue(), ^{
@@ -284,6 +316,9 @@
             }
 
             [self.messageFrameArray addObjectsFromArray:messageFrameArray];
+            
+            //更新展示的数组
+            [self updateShowMessageFrameArray];
             NSLog(@"网络请求完毕");
             
             dispatch_sync(dispatch_get_main_queue(), ^{
@@ -293,6 +328,25 @@
         //创建的task是停止状态，需要启动
         [task resume];
     });
+}
+
+
+#pragma mark - 更新显示要展示的微博数组
+- (void)updateShowMessageFrameArray {
+    //每次更新之前 清空数组
+    [self.showMessageFrameArray removeAllObjects];
+    
+    if ([self.btnText isEqualToString:@"全部"]) { //  展示全部微博数据
+        self.showMessageFrameArray = self.messageFrameArray;
+    } else {
+        //遍历找出含有关键词的微博数据
+        for (WeiboMessageFrame *messageFrame in _messageFrameArray) {   //展示特定的微博数据
+            WeiboMessage *message = messageFrame.message;
+            if ([message.text containsString:_btnText] || [message.user.screen_name containsString:_btnText]) {
+                [_showMessageFrameArray addObject:messageFrame];
+            }
+        }
+    }
 }
 
 
@@ -308,18 +362,18 @@
 }
 
 
-#pragma mark - tableView数据源方法
+#pragma mark - tableView数据源方法 和 代理
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return self.messageFrameArray.count;;
-}
-
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return 1;
 }
 
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    return self.showMessageFrameArray.count;
+}
+
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.section < _messageFrameArray.count) {
-        WeiboMessageFrame *messageFrame = self.messageFrameArray[indexPath.section];
+    if (indexPath.row < _showMessageFrameArray.count) {
+        WeiboMessageFrame *messageFrame = self.showMessageFrameArray[indexPath.row];
         return messageFrame.rowHeight;
     } else return 200;
 }
@@ -327,7 +381,7 @@
 //cell被点击
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-    WeiboMessageFrame *frame = self.messageFrameArray[indexPath.section];
+    WeiboMessageFrame *frame = self.showMessageFrameArray[indexPath.row];
     WeiboMessage *message = frame.message;
     
     //发送通知，添加到浏览历史中
@@ -338,7 +392,7 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     WeiboMessageFrame *messageFrame = [[WeiboMessageFrame alloc] init];
     
-    messageFrame = self.messageFrameArray[indexPath.section];
+    messageFrame = self.showMessageFrameArray[indexPath.row];
 
     NSString *ID = @"message";
     
@@ -353,6 +407,21 @@
     [cell loadCellWithMessageFrame:messageFrame];
     
     return cell;
+}
+
+//设置hearTab
+- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
+    //headerTabBar
+    CGFloat viewW = [UIScreen mainScreen].bounds.size.width;
+    CGFloat viewH = 60;
+    CGFloat viewX = 0;
+    CGFloat viewY = CGRectGetMaxY(self.navigationController.navigationBar.frame);
+    HeadTabView *headTabView = [[HeadTabView alloc] initWithFrame:CGRectMake(viewX, viewY, viewW, viewH)];
+    return headTabView;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
+    return 60;
 }
 
 
