@@ -131,6 +131,7 @@
     [center removeObserver:self name:@"addLikeMessage" object:nil];
     [center removeObserver:self name:@"deleteLikeMessage" object:nil];
     [center removeObserver:self name:@"openUrl" object:nil];
+    [center removeObserver:self name:@"headerTabBtnClick" object:nil];
 }
 
 
@@ -337,7 +338,8 @@
     [self.showMessageFrameArray removeAllObjects];
     
     if ([self.btnText isEqualToString:@"全部"]) { //  展示全部微博数据
-        self.showMessageFrameArray = self.messageFrameArray;
+//        self.showMessageFrameArray = self.messageFrameArray;
+        [self.showMessageFrameArray addObjectsFromArray:self.messageFrameArray];
     } else {
         //遍历找出含有关键词的微博数据
         for (WeiboMessageFrame *messageFrame in _messageFrameArray) {   //展示特定的微博数据
@@ -359,6 +361,9 @@
     //rightBarButton
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(loadNewMessages)];
     self.navigationItem.rightBarButtonItem.tintColor = [UIColor orangeColor];
+    
+    //初始化 默认为 全部
+    _btnText = @"全部";
 }
 
 

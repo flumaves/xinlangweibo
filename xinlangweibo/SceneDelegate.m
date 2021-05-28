@@ -35,6 +35,10 @@
 @implementation SceneDelegate
 
 - (void)scene:(UIScene *)scene willConnectToSession:(UISceneSession *)session options:(UISceneConnectionOptions *)connectionOptions {
+    //添加一个观察者
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+    [center addObserver:self selector:@selector(pushNewView:) name:@"pushNewView" object:nil];
+    
     UIWindowScene *windowScene = (UIWindowScene *)scene;
     self.window = [[UIWindow alloc] initWithWindowScene:windowScene];
     
@@ -86,4 +90,25 @@
     }
 }
 
+
+#pragma mark - 观察者方法
+- (void)pushNewView:(NSNotification *)notification {
+    UITabBarController *tabBar = [[UITabBarController alloc] init];
+    //图片的渲染颜色
+    tabBar.tabBar.tintColor = [UIColor orangeColor];
+    
+    //tabbar添加控制器
+    _homeTableViewController = [[HomeTableViewController alloc] init];
+    [self tabBar:tabBar addChildViewController: _homeTableViewController  withTitle:@"主页" withImage:@"主页"];
+    _messageTableViewController = [[MessageTableViewController alloc] init];
+    [self tabBar:tabBar addChildViewController: _messageTableViewController withTitle:@"消息" withImage:@"消息"];
+    _launchTableViewController = [[LaunchViewController alloc] init];
+    [self tabBar:tabBar addChildViewController: _launchTableViewController withTitle:@"发布" withImage:@"发布"];
+    _findTableViewController = [[FindTableViewController alloc] init];
+    [self tabBar:tabBar addChildViewController: _findTableViewController withTitle:@"发现" withImage:@"发现"];
+    _personTableViewController = [[PersonTableViewController alloc] init];
+    [self tabBar:tabBar addChildViewController: _personTableViewController withTitle:@"个人" withImage:@"个人"];
+    
+    self.window.rootViewController = tabBar;
+}
 @end

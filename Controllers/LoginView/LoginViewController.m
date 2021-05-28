@@ -57,8 +57,8 @@
             //获取access_token
             _access_token = [self getAccessTokenWithCode:code];
             
-            //返回主页面
-            [self.navigationController popViewControllerAnimated:YES];
+//            //返回主页面
+//            [self.navigationController popViewControllerAnimated:YES];
             
             return;
         } else if ([query containsString:@"error"]) {
@@ -66,7 +66,6 @@
             NSLog(@"用户取消授权");
             decisionHandler(WKNavigationResponsePolicyCancel);
             
-            [self.navigationController popViewControllerAnimated:YES];
             return;
         }
     }
@@ -83,7 +82,8 @@
     //  https://api.weibo.com/oauth2/authorize
     //  授权回调页：https://api.weibo.com/oauth2/default.html
     //  取消授权回调页：https://api.weibo.com/oauth2/default.html
-    NSString *client_id = @"3240248154";
+    
+    NSString *client_id = @"849752584";
     NSString *baseURL = @"https://api.weibo.com/oauth2/authorize";
     NSString *redirect_uri = @"https://api.weibo.com/oauth2/default.html";
     
@@ -96,8 +96,8 @@
 #pragma mark - 获取access_token
 - (NSString *)getAccessTokenWithCode:(NSString *)code {
     //post请求
-    NSString *client_id = @"3240248154";
-    NSString *client_secret = @"8a51150c3d1050bdfd1d0183c6e6e02f";
+    NSString *client_id = @"849752584";
+    NSString *client_secret = @"91ce9498571f054d4b55b6bfd406f0f7";
     NSString *redirect_uri = @"https://api.weibo.com/oauth2/default.html";
     NSString *baseURLString = @"https://api.weibo.com/oauth2/access_token";
 
@@ -123,7 +123,13 @@
         //储存账户信息
         [UserAccountTool saveAccount:account];
         
-        NSLog(@"%@",account.access_token);
+        //跳回去原页面
+//        [self.navigationController popViewControllerAnimated:YES];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+            [center postNotificationName:@"pushNewView" object:nil];
+        });
     }];
     //创建的task是停止状态，需要启动
     [task resume];
@@ -132,6 +138,7 @@
     return access_token;
 }
 
+//清除web的缓存
 - (void)deleteWebCache {
     NSSet *webDataTypes = [WKWebsiteDataStore allWebsiteDataTypes];
     

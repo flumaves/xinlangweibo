@@ -377,7 +377,7 @@
     }
 }
 
-//通过url获取头像
+///通过url获取头像
 - (void)getHeadImgWithUrlString:(NSString *)urlString {
     //请求网络的图片
     dispatch_async(dispatch_get_global_queue(0, 0), ^{
@@ -390,7 +390,7 @@
     });
 }
 
-//获取缩略图
+///获取缩略图
 - (void)getThumbnailImgWithUrlString:(NSString *)urlString {
     if ([urlString containsString:@"http"]) {   //判断路径是网络的还是本地的
         dispatch_async(dispatch_get_global_queue(0, 0), ^{
@@ -408,7 +408,7 @@
     }
 }
 
-//点击收藏按钮
+///点击收藏按钮
 - (void)likeMessageBtnClick {
     if ([self.likeMessage isEqual:@"YES"]) {     //取消收藏
         _likeMessage = @"NO";
@@ -429,6 +429,8 @@
     }
 }
 
+
+#pragma mark - 时间格式的转化
 //转化成几分钟前的格式
 - (NSString *)messureTheTime {
     //获取发布时间的时间戳
