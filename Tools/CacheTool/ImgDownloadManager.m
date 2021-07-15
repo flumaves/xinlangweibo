@@ -50,9 +50,9 @@
         dispatch_async(dispatch_get_main_queue(), ^{
             completionBlock(image);
         });
+        
+        //缓存图片
+        [self.cacheManager saveImage:image urlString:urlString];
     });
-    
-    //缓存图片
-    [self.cacheManager saveImage:image urlString:urlString];
 }
 @end
