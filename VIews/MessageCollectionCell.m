@@ -83,7 +83,7 @@
 }
 
 #pragma mark  初始化控件
-- (instancetype)init
+- (instancetype)loadViews
 {
     //顶部分割
     _topDividView = [[UIView alloc] init];
@@ -209,6 +209,9 @@
         [self.REimgArray addObject:REimgView];  //把添加的imgView储存到数组中
         [self.REimgView addSubview:REimgView];
     }
+    
+    self.full = YES;
+    
     return self;
 }
 

@@ -7,6 +7,7 @@
 
 #import "MessageCell.h"
 #import "MessageTool.h"
+#import "UIImageView+PlaceHolder.h"
 
 @interface MessageCell () <UITextViewDelegate>
 //是否为收藏的微博
@@ -265,36 +266,27 @@
     }
     
     //缩略图
-    if (_messageFrame.message.pic_urls.count > 1) {
+    if (_messageFrame.message.pic_urls.count > 1) { //多张图片
         _imgView.frame = _messageFrame.imgView_frame;
         _thumbnail_pic.hidden = YES;
         _imgView.hidden = NO;
         
         //请求图片
-        dispatch_async(dispatch_get_global_queue(0, 0), ^{
-            for (int i = 0; i < self.imgArray.count; i++) {
-                UIImageView *imgView = self.imgArray[i];
-                if (i < self.messageFrame.message.pic_urls.count) { //判断是否需要显示照片
-                    //判断imgView的编号 获取对应位置的图片
-                    NSDictionary *dict = self.messageFrame.message.pic_urls[i];
-                    NSString *urlString = dict[@"thumbnail_pic"];
-                    
-                    NSURL *url = [NSURL URLWithString:urlString];
-                    NSData *imgData = [NSData dataWithContentsOfURL:url];
+        for (int i = 0; i < self.imgArray.count; i++) {
+            UIImageView *imgView = self.imgArray[i];
+            if (i < self.messageFrame.message.pic_urls.count) { //判断是否需要显示照片
+                //判断imgView的编号 获取对应位置的图片
+                NSDictionary *dict = self.messageFrame.message.pic_urls[i];
+                NSString *urlString = dict[@"thumbnail_pic"];
+
+                [imgView setImageWithURLString:urlString];
+                imgView.hidden = NO;
                 
-                    dispatch_sync(dispatch_get_main_queue(), ^{
-                        imgView.image = [UIImage imageWithData:imgData];
-                        imgView.hidden = NO;
-                    });
-                    
-                } else {
-                    //不需要显示图片 隐藏imgView
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        imgView.hidden = YES;
-                    });
-                }
+            } else {
+                //不需要显示图片 隐藏imgView
+                imgView.hidden = YES;
             }
-        });
+        }
     } else {
         _thumbnail_pic.frame = messageFrame.thumbnail_pic_frame;
         if (messageFrame.message.thumbnail_pic == NULL) {
@@ -307,7 +299,7 @@
         }
     }
     
-    ///转发微博部分
+///转发微博部分
     //获取转发微博的模型
     if (_messageFrame.message.retweeted_status == nil) {
         //转发模块隐藏
@@ -338,31 +330,21 @@
             _REimgView.hidden = NO;
             
             //请求图片
-            dispatch_async(dispatch_get_global_queue(0, 0), ^{
-                for (int i = 0; i < self.REimgArray.count; i++) {
-                    UIImageView *imgView = self.REimgArray[i];
-                    if (i < REmessage.pic_urls.count) { //判断是否需要显示照片
-                        
-                        //根据imgView的编号 获取对应位置的照片
-                        NSDictionary *dict = REmessage.pic_urls[i];
-                        NSString *urlString = dict[@"thumbnail_pic"];
-                        
-                        NSURL *url = [NSURL URLWithString:urlString];
-                        NSData *imgData = [NSData dataWithContentsOfURL:url];
+            for (int i = 0; i < self.REimgArray.count; i++) {
+                UIImageView *imgView = self.REimgArray[i];
+                if (i < REmessage.pic_urls.count) { //判断是否需要显示照片
+                    //判断imgView的编号 获取对应位置的图片
+                    NSDictionary *dict = REmessage.pic_urls[i];
+                    NSString *urlString = dict[@"thumbnail_pic"];
+
+                    [imgView setImageWithURLString:urlString];
+                    imgView.hidden = NO;
                     
-                        dispatch_sync(dispatch_get_main_queue(), ^{
-                            imgView.image = [UIImage imageWithData:imgData];
-                            imgView.hidden = NO;
-                        });
-                        
-                    } else {
-                        //不需要显示图片 隐藏imgView
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            imgView.hidden = YES;
-                        });
-                    }
+                } else {
+                    //不需要显示图片 隐藏imgView
+                    imgView.hidden = YES;
                 }
-            });
+            }
         } else {
             _REthumbnail_pic.frame = messageFrame.REthumbnail_pic_frame;
             if (REmessage.thumbnail_pic == NULL) {
@@ -371,7 +353,7 @@
             } else {
                 _REthumbnail_pic.hidden = NO;
                 _REimgView.hidden = YES;
-                [self getThumbnailImgWithUrlString:REmessage.original_pic];
+                [self getREThumbnailImgWithUrlString:REmessage.original_pic];
             }
         }
     }
@@ -380,33 +362,33 @@
 ///通过url获取头像
 - (void)getHeadImgWithUrlString:(NSString *)urlString {
     //请求网络的图片
-    dispatch_async(dispatch_get_global_queue(0, 0), ^{
-        NSURL *url = [NSURL URLWithString:urlString];
-        NSData *imgData = [NSData dataWithContentsOfURL:url];
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            self.user_Img.image = [UIImage imageWithData:imgData];
-        });
-    });
+    [_user_Img setImageWithURLString:urlString];
 }
 
 ///获取缩略图
 - (void)getThumbnailImgWithUrlString:(NSString *)urlString {
     if ([urlString containsString:@"http"]) {   //判断路径是网络的还是本地的
-        dispatch_async(dispatch_get_global_queue(0, 0), ^{
-            NSURL *url = [NSURL URLWithString:urlString];
-            NSData *imgData = [NSData dataWithContentsOfURL:url];
-            
-            dispatch_async(dispatch_get_main_queue(), ^{
-                self.thumbnail_pic.image = [UIImage imageWithData:imgData];
-            });
-        });
+        //网络图片
+        [self.thumbnail_pic setImageWithURLString:urlString];
+    } else {
+        //本地图片
+        NSData *data = [MessageTool getImageDataWithURLString:urlString];
+        
+        self.thumbnail_pic.image = [UIImage imageWithData:data];
+    }
+}
+//转发的微博的缩略图
+- (void)getREThumbnailImgWithUrlString:(NSString *)urlString {
+    if ([urlString containsString:@"http"]) {   //判断路径是网络的还是本地的
+
+        [self.REthumbnail_pic setImageWithURLString:urlString];
     } else {
         NSData *data = [MessageTool getImageDataWithURLString:urlString];
         
         self.thumbnail_pic.image = [UIImage imageWithData:data];
     }
 }
+
 
 ///点击收藏按钮
 - (void)likeMessageBtnClick {

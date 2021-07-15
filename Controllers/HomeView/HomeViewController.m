@@ -51,13 +51,15 @@
 }
 
 - (void)layoutView {
+    //collectionView布局
     UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
     layout.minimumLineSpacing = 0;
     layout.minimumInteritemSpacing = 0;
+    layout.itemSize = CGSizeMake([UIScreen mainScreen].bounds.size.width, 200);
+    layout.scrollDirection = UICollectionViewScrollDirectionVertical;
     
     self.collectionView = [[UICollectionView alloc] initWithFrame:self.view.bounds collectionViewLayout:layout];
     self.collectionView.backgroundColor = [UIColor whiteColor];
-    
     self.collectionView.delegate = self;
     self.collectionView.dataSource = self;
 
@@ -414,12 +416,12 @@
 
     messageFrame = self.showMessageFrameArray[indexPath.row];
 
-    MessageCollectionCell *cell = [self.collectionView dequeueReusableCellWithReuseIdentifier:@"message" forIndexPath:indexPath];
+    MessageCollectionCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"message" forIndexPath:indexPath];
 
-    if (cell == nil) {
-        cell = [[MessageCollectionCell alloc] init];
+    if (cell.full == NO) {
+        [cell loadViews];
     }
-
+        
     [cell loadCellWithMessageFrame:messageFrame];
 
     return cell;

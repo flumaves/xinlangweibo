@@ -29,6 +29,10 @@
 		9B7D584626457A2500E8B2A1 /* LoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B7D584526457A2500E8B2A1 /* LoginViewController.m */; };
 		9BD1CF77269DDC2100BBD67E /* HomeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BD1CF76269DDC2100BBD67E /* HomeViewController.m */; };
 		9BD1CF7B26A01CF500BBD67E /* MemoryCacheManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BD1CF7A26A01CF500BBD67E /* MemoryCacheManager.m */; };
+		9BD1CF7E26A0231A00BBD67E /* DiskCacheManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BD1CF7D26A0231A00BBD67E /* DiskCacheManager.m */; };
+		9BD1CF8126A0416C00BBD67E /* CacheManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BD1CF8026A0416C00BBD67E /* CacheManager.m */; };
+		9BD1CF8526A0471A00BBD67E /* UIImageView+PlaceHolder.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BD1CF8426A0471A00BBD67E /* UIImageView+PlaceHolder.m */; };
+		9BD1CF8826A048FA00BBD67E /* ImgDownloadManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BD1CF8726A048FA00BBD67E /* ImgDownloadManager.m */; };
 		9BF534E7264C27120044F3E7 /* WebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BF534E6264C27120044F3E7 /* WebViewController.m */; };
 		9BF5356D264D3F910044F3E7 /* StatusTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BF5356C264D3F910044F3E7 /* StatusTableViewController.m */; };
 		9BF53570264D73FB0044F3E7 /* MessageTool.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BF5356F264D73FB0044F3E7 /* MessageTool.m */; };
@@ -102,6 +106,14 @@
 		9BD1CF76269DDC2100BBD67E /* HomeViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HomeViewController.m; sourceTree = "<group>"; };
 		9BD1CF7926A01CF500BBD67E /* MemoryCacheManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MemoryCacheManager.h; sourceTree = "<group>"; };
 		9BD1CF7A26A01CF500BBD67E /* MemoryCacheManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MemoryCacheManager.m; sourceTree = "<group>"; };
+		9BD1CF7C26A0231A00BBD67E /* DiskCacheManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DiskCacheManager.h; sourceTree = "<group>"; };
+		9BD1CF7D26A0231A00BBD67E /* DiskCacheManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DiskCacheManager.m; sourceTree = "<group>"; };
+		9BD1CF7F26A0416C00BBD67E /* CacheManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CacheManager.h; sourceTree = "<group>"; };
+		9BD1CF8026A0416C00BBD67E /* CacheManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CacheManager.m; sourceTree = "<group>"; };
+		9BD1CF8326A0471A00BBD67E /* UIImageView+PlaceHolder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIImageView+PlaceHolder.h"; sourceTree = "<group>"; };
+		9BD1CF8426A0471A00BBD67E /* UIImageView+PlaceHolder.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIImageView+PlaceHolder.m"; sourceTree = "<group>"; };
+		9BD1CF8626A048FA00BBD67E /* ImgDownloadManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ImgDownloadManager.h; sourceTree = "<group>"; };
+		9BD1CF8726A048FA00BBD67E /* ImgDownloadManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ImgDownloadManager.m; sourceTree = "<group>"; };
 		9BF534E5264C27120044F3E7 /* WebViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WebViewController.h; sourceTree = "<group>"; };
 		9BF534E6264C27120044F3E7 /* WebViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WebViewController.m; sourceTree = "<group>"; };
 		9BF5356B264D3F910044F3E7 /* StatusTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StatusTableViewController.h; sourceTree = "<group>"; };
@@ -211,6 +223,7 @@
 		9B7D577F263EB4D900E8B2A1 = {
 			isa = PBXGroup;
 			children = (
+				9BD1CF8226A0459100BBD67E /* Catagory */,
 				9B7D58352645736200E8B2A1 /* Tools */,
 				9B7D57C2263EB6DA00E8B2A1 /* Models */,
 				9B7D57F32645438D00E8B2A1 /* xinlangweibo */,
@@ -330,8 +343,23 @@
 			children = (
 				9BD1CF7926A01CF500BBD67E /* MemoryCacheManager.h */,
 				9BD1CF7A26A01CF500BBD67E /* MemoryCacheManager.m */,
+				9BD1CF7C26A0231A00BBD67E /* DiskCacheManager.h */,
+				9BD1CF7D26A0231A00BBD67E /* DiskCacheManager.m */,
+				9BD1CF7F26A0416C00BBD67E /* CacheManager.h */,
+				9BD1CF8026A0416C00BBD67E /* CacheManager.m */,
+				9BD1CF8626A048FA00BBD67E /* ImgDownloadManager.h */,
+				9BD1CF8726A048FA00BBD67E /* ImgDownloadManager.m */,
 			);
 			path = CacheTool;
+			sourceTree = "<group>";
+		};
+		9BD1CF8226A0459100BBD67E /* Catagory */ = {
+			isa = PBXGroup;
+			children = (
+				9BD1CF8326A0471A00BBD67E /* UIImageView+PlaceHolder.h */,
+				9BD1CF8426A0471A00BBD67E /* UIImageView+PlaceHolder.m */,
+			);
+			path = Catagory;
 			sourceTree = "<group>";
 		};
 		9BF534E4264C26EF0044F3E7 /* WebVIew */ = {
@@ -491,6 +519,7 @@
 				9BF536082657496C0044F3E7 /* SearchHistoryTool.m in Sources */,
 				9B7D57C5263EB70800E8B2A1 /* HomeTableViewController.m in Sources */,
 				9BF5360F265F388A0044F3E7 /* HeadTabView.m in Sources */,
+				9BD1CF8826A048FA00BBD67E /* ImgDownloadManager.m in Sources */,
 				9BF5361226608AB50044F3E7 /* NetWorkingTool.m in Sources */,
 				9B34120F26497F7A00122D3E /* WeiboMessageFrame.m in Sources */,
 				9B7D578D263EB4D900E8B2A1 /* AppDelegate.m in Sources */,
@@ -498,11 +527,14 @@
 				9B7D57D4263EC86900E8B2A1 /* LaunchViewController.m in Sources */,
 				9B398080269DB6DB0036EC82 /* MessageCollectionCell.m in Sources */,
 				9BF5356D264D3F910044F3E7 /* StatusTableViewController.m in Sources */,
+				9BD1CF8526A0471A00BBD67E /* UIImageView+PlaceHolder.m in Sources */,
 				9B7D584626457A2500E8B2A1 /* LoginViewController.m in Sources */,
 				9B341208264842DA00122D3E /* MessageCell.m in Sources */,
 				9B7D579E263EB4DA00E8B2A1 /* main.m in Sources */,
 				9BF534E7264C27120044F3E7 /* WebViewController.m in Sources */,
 				9B7D57CE263EB79100E8B2A1 /* PersonTableViewController.m in Sources */,
+				9BD1CF7E26A0231A00BBD67E /* DiskCacheManager.m in Sources */,
+				9BD1CF8126A0416C00BBD67E /* CacheManager.m in Sources */,
 				9B65028F264781540074D6A0 /* WeiboMessage.m in Sources */,
 				9B7D5790263EB4D900E8B2A1 /* SceneDelegate.m in Sources */,
 				9B3411792647909200122D3E /* UserAccountTool.m in Sources */,

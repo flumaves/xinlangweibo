@@ -95,7 +95,7 @@
             @"thumbnail_pic"    : message.thumbnail_pic ? message.thumbnail_pic : @"",
             @"bmiddle_pic"      : message.bmiddle_pic ? message.bmiddle_pic : @"",
             @"original_pic"     : message.original_pic ? message.original_pic : @"",
-            @"pic_urls"          : message.pic_urls ? message.pic_urls : @"",
+            @"pic_urls"         : message.pic_urls ? message.pic_urls : @"",
             @"likeMessage"      : message.likeMessage
         };
         

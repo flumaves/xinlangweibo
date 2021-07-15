@@ -14,6 +14,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MessageCollectionCell : UICollectionViewCell
 
+//判断cell中是否进行了初始化
+@property (nonatomic, getter = isFull)BOOL full;
+
+//初始化cell
+- (instancetype)loadViews;
+
 //frame模型
 @property (nonatomic, strong)WeiboMessageFrame *messageFrame;
 
