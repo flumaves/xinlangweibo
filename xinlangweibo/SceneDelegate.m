@@ -13,7 +13,7 @@
 #import "FindTableViewController.h"
 #import "PersonTableViewController.h"
 #import "VisitorViewController.h"
-
+#import "HomeViewController.h"
 #import "UserAccount.h"
 #import "UserAccountTool.h"
 
@@ -21,6 +21,8 @@
 @interface SceneDelegate ()
 //主页
 @property (nonatomic, strong)HomeTableViewController *homeTableViewController;
+
+@property (nonatomic, strong)HomeViewController *homeViewController;
 //消息
 @property (nonatomic, strong)MessageTableViewController *messageTableViewController;
 //发布
@@ -69,8 +71,12 @@
         tabBar.tabBar.tintColor = [UIColor orangeColor];
         
         //tabbar添加控制器
-        _homeTableViewController = [[HomeTableViewController alloc] init];
-        [self tabBar:tabBar addChildViewController: _homeTableViewController  withTitle:@"主页" withImage:@"主页"];
+//        _homeTableViewController = [[HomeTableViewController alloc] init];
+//        [self tabBar:tabBar addChildViewController: _homeTableViewController  withTitle:@"主页" withImage:@"主页"];
+        
+        _homeViewController = [[HomeViewController alloc] init];
+        [self tabBar:tabBar addChildViewController:_homeViewController withTitle:@"主页" withImage:@"主页"];
+        
         _messageTableViewController = [[MessageTableViewController alloc] init];
         [self tabBar:tabBar addChildViewController: _messageTableViewController withTitle:@"消息" withImage:@"消息"];
         _launchTableViewController = [[LaunchViewController alloc] init];

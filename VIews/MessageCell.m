@@ -215,7 +215,7 @@
 }
 
 
-#pragma mark 加载控件布局
+#pragma mark 加载控件内容
 - (void)loadCellWithMessageFrame:(WeiboMessageFrame *)messageFrame {
     _messageFrame = messageFrame;
     

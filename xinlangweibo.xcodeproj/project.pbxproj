@@ -12,6 +12,7 @@
 		9B341208264842DA00122D3E /* MessageCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B341207264842DA00122D3E /* MessageCell.m */; };
 		9B34120C26495A5A00122D3E /* UserModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B34120B26495A5A00122D3E /* UserModel.m */; };
 		9B34120F26497F7A00122D3E /* WeiboMessageFrame.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B34120E26497F7A00122D3E /* WeiboMessageFrame.m */; };
+		9B398080269DB6DB0036EC82 /* MessageCollectionCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B39807F269DB6DB0036EC82 /* MessageCollectionCell.m */; };
 		9B65028F264781540074D6A0 /* WeiboMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B65028E264781540074D6A0 /* WeiboMessage.m */; };
 		9B7D578D263EB4D900E8B2A1 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B7D578C263EB4D900E8B2A1 /* AppDelegate.m */; };
 		9B7D5790263EB4D900E8B2A1 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B7D578F263EB4D900E8B2A1 /* SceneDelegate.m */; };
@@ -26,6 +27,8 @@
 		9B7D57D4263EC86900E8B2A1 /* LaunchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B7D57D3263EC86900E8B2A1 /* LaunchViewController.m */; };
 		9B7D57F026453D2C00E8B2A1 /* VisitorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B7D57EF26453D2C00E8B2A1 /* VisitorViewController.m */; };
 		9B7D584626457A2500E8B2A1 /* LoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B7D584526457A2500E8B2A1 /* LoginViewController.m */; };
+		9BD1CF77269DDC2100BBD67E /* HomeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BD1CF76269DDC2100BBD67E /* HomeViewController.m */; };
+		9BD1CF7B26A01CF500BBD67E /* MemoryCacheManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BD1CF7A26A01CF500BBD67E /* MemoryCacheManager.m */; };
 		9BF534E7264C27120044F3E7 /* WebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BF534E6264C27120044F3E7 /* WebViewController.m */; };
 		9BF5356D264D3F910044F3E7 /* StatusTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BF5356C264D3F910044F3E7 /* StatusTableViewController.m */; };
 		9BF53570264D73FB0044F3E7 /* MessageTool.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BF5356F264D73FB0044F3E7 /* MessageTool.m */; };
@@ -63,6 +66,8 @@
 		9B34120B26495A5A00122D3E /* UserModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UserModel.m; sourceTree = "<group>"; };
 		9B34120D26497F7A00122D3E /* WeiboMessageFrame.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WeiboMessageFrame.h; sourceTree = "<group>"; };
 		9B34120E26497F7A00122D3E /* WeiboMessageFrame.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WeiboMessageFrame.m; sourceTree = "<group>"; };
+		9B39807E269DB6DB0036EC82 /* MessageCollectionCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MessageCollectionCell.h; sourceTree = "<group>"; };
+		9B39807F269DB6DB0036EC82 /* MessageCollectionCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MessageCollectionCell.m; sourceTree = "<group>"; };
 		9B65028D264781540074D6A0 /* WeiboMessage.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WeiboMessage.h; sourceTree = "<group>"; };
 		9B65028E264781540074D6A0 /* WeiboMessage.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WeiboMessage.m; sourceTree = "<group>"; };
 		9B7D5788263EB4D900E8B2A1 /* xinlangweibo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = xinlangweibo.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -93,6 +98,10 @@
 		9B7D57EF26453D2C00E8B2A1 /* VisitorViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VisitorViewController.m; sourceTree = "<group>"; };
 		9B7D584426457A2500E8B2A1 /* LoginViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LoginViewController.h; sourceTree = "<group>"; };
 		9B7D584526457A2500E8B2A1 /* LoginViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LoginViewController.m; sourceTree = "<group>"; };
+		9BD1CF75269DDC2100BBD67E /* HomeViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HomeViewController.h; sourceTree = "<group>"; };
+		9BD1CF76269DDC2100BBD67E /* HomeViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HomeViewController.m; sourceTree = "<group>"; };
+		9BD1CF7926A01CF500BBD67E /* MemoryCacheManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MemoryCacheManager.h; sourceTree = "<group>"; };
+		9BD1CF7A26A01CF500BBD67E /* MemoryCacheManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MemoryCacheManager.m; sourceTree = "<group>"; };
 		9BF534E5264C27120044F3E7 /* WebViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WebViewController.h; sourceTree = "<group>"; };
 		9BF534E6264C27120044F3E7 /* WebViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WebViewController.m; sourceTree = "<group>"; };
 		9BF5356B264D3F910044F3E7 /* StatusTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StatusTableViewController.h; sourceTree = "<group>"; };
@@ -148,6 +157,8 @@
 			children = (
 				9B7D57C3263EB70800E8B2A1 /* HomeTableViewController.h */,
 				9B7D57C4263EB70800E8B2A1 /* HomeTableViewController.m */,
+				9BD1CF75269DDC2100BBD67E /* HomeViewController.h */,
+				9BD1CF76269DDC2100BBD67E /* HomeViewController.m */,
 			);
 			path = HomeView;
 			sourceTree = "<group>";
@@ -246,6 +257,8 @@
 				9B341207264842DA00122D3E /* MessageCell.m */,
 				9BF5360D265F388A0044F3E7 /* HeadTabView.h */,
 				9BF5360E265F388A0044F3E7 /* HeadTabView.m */,
+				9B39807E269DB6DB0036EC82 /* MessageCollectionCell.h */,
+				9B39807F269DB6DB0036EC82 /* MessageCollectionCell.m */,
 			);
 			path = VIews;
 			sourceTree = "<group>";
@@ -299,6 +312,7 @@
 		9B7D58352645736200E8B2A1 /* Tools */ = {
 			isa = PBXGroup;
 			children = (
+				9BD1CF7826A01CC700BBD67E /* CacheTool */,
 				9B3411772647909200122D3E /* UserAccountTool.h */,
 				9B3411782647909200122D3E /* UserAccountTool.m */,
 				9BF5356E264D73FB0044F3E7 /* MessageTool.h */,
@@ -309,6 +323,15 @@
 				9BF5361126608AB50044F3E7 /* NetWorkingTool.m */,
 			);
 			path = Tools;
+			sourceTree = "<group>";
+		};
+		9BD1CF7826A01CC700BBD67E /* CacheTool */ = {
+			isa = PBXGroup;
+			children = (
+				9BD1CF7926A01CF500BBD67E /* MemoryCacheManager.h */,
+				9BD1CF7A26A01CF500BBD67E /* MemoryCacheManager.m */,
+			);
+			path = CacheTool;
 			sourceTree = "<group>";
 		};
 		9BF534E4264C26EF0044F3E7 /* WebVIew */ = {
@@ -473,6 +496,7 @@
 				9B7D578D263EB4D900E8B2A1 /* AppDelegate.m in Sources */,
 				9B7D57F026453D2C00E8B2A1 /* VisitorViewController.m in Sources */,
 				9B7D57D4263EC86900E8B2A1 /* LaunchViewController.m in Sources */,
+				9B398080269DB6DB0036EC82 /* MessageCollectionCell.m in Sources */,
 				9BF5356D264D3F910044F3E7 /* StatusTableViewController.m in Sources */,
 				9B7D584626457A2500E8B2A1 /* LoginViewController.m in Sources */,
 				9B341208264842DA00122D3E /* MessageCell.m in Sources */,
@@ -483,11 +507,13 @@
 				9B7D5790263EB4D900E8B2A1 /* SceneDelegate.m in Sources */,
 				9B3411792647909200122D3E /* UserAccountTool.m in Sources */,
 				9B34120C26495A5A00122D3E /* UserModel.m in Sources */,
+				9BD1CF77269DDC2100BBD67E /* HomeViewController.m in Sources */,
 				9B34117C2647F65800122D3E /* Useraccount.m in Sources */,
 				9B7D57CB263EB78200E8B2A1 /* FindTableViewController.m in Sources */,
 				9BF53570264D73FB0044F3E7 /* MessageTool.m in Sources */,
 				9BF5360B26591B490044F3E7 /* SearchViewViewController.m in Sources */,
 				9B7D57C8263EB71300E8B2A1 /* MessageTableViewController.m in Sources */,
+				9BD1CF7B26A01CF500BBD67E /* MemoryCacheManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
