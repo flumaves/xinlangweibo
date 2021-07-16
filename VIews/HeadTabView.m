@@ -15,8 +15,11 @@
 //scorllView
 @property (nonatomic, strong)UIScrollView *scrollView;
 
-//slider
-@property (nonatomic, strong)UISlider *slider;
+//底部滑块
+@property (nonatomic, strong)UIView *buttonView;
+
+//记录滑块的位置
+@property (nonatomic)CGRect rect;
 
 @end
 
@@ -76,8 +79,17 @@
     self.scrollView.bounces = NO;
     self.scrollView.showsHorizontalScrollIndicator = NO;
     
-    //添加滚动条
-    [self addSlider];
+    //添加buttonView
+    CGFloat btnViewW = 30;
+    CGFloat btnViewH = 5;
+    CGFloat btnViewY = scrollViewH - btnViewH;
+    CGFloat btnViewX = (btnW - btnViewW) / 2;
+    self.buttonView = [[UIView alloc] initWithFrame:CGRectMake(btnViewX, btnViewY, btnViewX, btnViewH)];
+    //记录滑块位置
+    self.rect = self.buttonView.frame;
+    self.buttonView.backgroundColor = [UIColor orangeColor];
+    
+    [self addSubview:_buttonView];
 }
 
 //添加按钮
@@ -97,56 +109,56 @@
 }
 
 
-//添加slider
-- (void)addSlider {
-    CGFloat sliderX = 0;
-    CGFloat sliderY = 40;   //40 为btn的高度
-    CGFloat sliderW = [UIScreen mainScreen].bounds.size.width;
-    CGFloat sliderH = 20;
-    
-    self.slider = [[UISlider alloc] initWithFrame:CGRectMake(sliderX, sliderY, sliderW, sliderH)];
-    _slider.backgroundColor = [UIColor colorWithRed:248 /255.0 green:248 /255.0 blue:248 /255.0 alpha:1];
-    self.slider.userInteractionEnabled = YES;
-    self.slider.enabled = YES;
-    [_slider setThumbImage:[UIImage imageNamed:@"slider"] forState:UIControlStateNormal];
-    [_slider setMinimumTrackTintColor:[UIColor orangeColor]];
-    [_slider setValue:0];
-    
-    [self.slider addTarget:self action:@selector(changeContentOffset:) forControlEvents:UIControlEventValueChanged|UIControlEventTouchDown];
-    
-    _slider.maximumValue = self.scrollView.contentSize.width - [UIScreen mainScreen].bounds.size.width;
-    
-    [self addSubview:_slider];
-}
-
 #pragma mark 按钮点击事件
 - (void)btnClick:(UIButton *)button {
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
     
     NSLog(@"%@",button.titleLabel.text);
     
-    //让选中的按钮变色，其他为黑色
+    //1.让选中的按钮变色，其他为黑色
     //先遍历全为黑色
     for (UIButton *btn in self.btnArray) {
         [btn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     }
     //选中的btn为橙色
     [button setTitleColor:[UIColor orangeColor] forState:UIControlStateNormal];
+    
+    //2.移动滑块
+    //按钮的X
+    CGRect rect = [button convertRect:button.bounds toView:self.scrollView];
+    CGFloat offsetX = self.scrollView.contentOffset.x;
+    CGFloat btnX = rect.origin.x - offsetX;
+    //滑块与按钮的相对位置
+    CGFloat btnViewX = btnX + (button.bounds.size.width - self.buttonView.bounds.size.width) / 2;
+    [self moveButtonViewTo:btnViewX];
+    //重新记录滑块位置
+    rect.origin.x += (button.bounds.size.width - self.buttonView.bounds.size.width) / 2;
+    self.rect = rect;
         
-    //发送通知，显示对应类别的数据
+    //3.发送通知，显示对应类别的数据
     [center postNotificationName:@"headerTabBtnClick" object:button];
 }
 
-
-#pragma mark - slider的方法
-- (void)changeContentOffset:(UISlider *)slider {
-    [self.scrollView setContentOffset:CGPointMake(slider.value, 0)];
+/// 移动滑块到对应位置
+//点击按钮
+- (void)moveButtonViewTo:(CGFloat)btnViewX {
+    [UIView animateWithDuration:0.3 animations:^{
+        CGRect frame = self.buttonView.frame;
+        frame.origin.x = btnViewX;
+        self.buttonView.frame = frame;
+    }];
 }
 
-#pragma mark - scrollView的代理方法
-//监听偏移量，设置给slider
+//拖动scrollView
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
-    [self.slider setValue:scrollView.contentOffset.x];
+    //滑块的位置
+    CGFloat offsetX = self.scrollView.contentOffset.x;
+    CGFloat btnX = self.rect.origin.x - offsetX;
+
+    CGRect frame = self.buttonView.frame;
+    frame.origin.x = btnX;
+
+    self.buttonView.frame = frame;
 }
 
 @end

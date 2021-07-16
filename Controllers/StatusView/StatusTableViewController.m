@@ -30,6 +30,13 @@
     [super viewDidLoad];
     
     self.tableView.tableFooterView = [UIView new];
+    
+    UIRefreshControl *refreshControl = [[UIRefreshControl alloc] init];
+    refreshControl.tintColor = [UIColor orangeColor];
+    refreshControl.attributedTitle = [[NSAttributedString alloc] initWithString:@"下拉刷新"];
+    [refreshControl addTarget:self action:@selector(refresh:) forControlEvents:UIControlEventValueChanged];
+    
+    self.tableView.refreshControl = refreshControl;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -38,6 +45,11 @@
 
 - (void)viewWillDisappear:(BOOL)animated {
     [self removeObservers];
+}
+
+//刷新
+- (void)refresh:(UIRefreshControl *)sender {
+    [sender endRefreshing];
 }
 
 //收藏的微博

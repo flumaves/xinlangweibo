@@ -37,6 +37,9 @@
 //collectionView
 @property (nonatomic, strong)UICollectionView *collectionView;
 
+//headTabView
+@property (nonatomic, strong)HeadTabView *headTabView;
+
 @end
 
 @implementation HomeViewController
@@ -50,22 +53,41 @@
     [self layoutView];
 }
 
+#pragma mark - 加载整个view的布局
 - (void)layoutView {
+    //headTabView布局
+    CGRect rect = self.view.frame;
+    rect.origin.y = 91;
+    rect.size.height = 40;
+    self.headTabView = [[HeadTabView alloc] initWithFrame:rect];
+    
+    [self.view addSubview:_headTabView];
+    
     //collectionView布局
     UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
     layout.minimumLineSpacing = 0;
     layout.minimumInteritemSpacing = 0;
     layout.itemSize = CGSizeMake([UIScreen mainScreen].bounds.size.width, 200);
     layout.scrollDirection = UICollectionViewScrollDirectionVertical;
+    //layout.headerReferenceSize = CGSizeMake(self.view.bounds.size.width, 40);
     
-    self.collectionView = [[UICollectionView alloc] initWithFrame:self.view.bounds collectionViewLayout:layout];
+    //collectionView的frame
+    rect = self.view.frame;
+    rect.origin.y = CGRectGetMaxY(self.headTabView.frame);
+    self.collectionView = [[UICollectionView alloc] initWithFrame:rect collectionViewLayout:layout];
     self.collectionView.backgroundColor = [UIColor whiteColor];
     self.collectionView.delegate = self;
     self.collectionView.dataSource = self;
-
+    //注册cell
     [self.collectionView registerClass:[MessageCollectionCell class] forCellWithReuseIdentifier:@"message"];
+    //注册头视图
+    //[self.collectionView registerClass:[UICollectionReusableView class] forSupplementaryViewOfKind: UICollectionElementKindSectionHeader withReuseIdentifier:@"header"];
     
     [self.view addSubview:_collectionView];
+    
+    UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, 91)];
+    view.backgroundColor = [UIColor whiteColor];
+    [self.view addSubview:view];
 }
 
 #pragma mark - 观察者
@@ -402,7 +424,7 @@
 }
 
 
-#pragma mark <UICollectionViewDataSource>
+#pragma mark - collectionView的 delegate 和 dataSource
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
     return 1;
 }
@@ -434,11 +456,26 @@
     } else return CGSizeMake([UIScreen mainScreen].bounds.size.width, 200);
 }
 
-
-#pragma mark <UICollectionViewDelegate>
 - (BOOL)collectionView:(UICollectionView *)collectionView shouldHighlightItemAtIndexPath:(NSIndexPath *)indexPath {
     return NO;
 }
 
+//- (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath {
+//    if ([kind isEqual:UICollectionElementKindSectionHeader]) {
+//        
+//        UICollectionReusableView *headerView = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:@"header" forIndexPath:indexPath];
+//        
+//        //headerTabBar
+//        CGFloat viewW = [UIScreen mainScreen].bounds.size.width;
+//        CGFloat viewH = 40;
+//        CGFloat viewX = 0;
+//        CGFloat viewY = 0;
+//        HeadTabView *headTabView = [[HeadTabView alloc] initWithFrame:CGRectMake(viewX, viewY, viewW, viewH)];
+//        
+//        [headerView addSubview:headTabView];
+//        return headerView;
+//    }
+//    return nil;
+//}
 @end
 
