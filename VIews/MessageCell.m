@@ -280,6 +280,7 @@
                 NSString *urlString = dict[@"thumbnail_pic"];
 
                 [imgView setImageWithURLString:urlString];
+                
                 imgView.hidden = NO;
                 
             } else {

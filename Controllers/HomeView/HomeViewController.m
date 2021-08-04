@@ -16,6 +16,10 @@
 #import "UserAccountTool.h"
 #import "UserAccount.h"
 #import "HeadTabView.h"
+#import "RefreshView.h"
+#import <AFNetworking/AFNetworking.h>
+#import <MJRefreshNormalHeader.h>
+#import <MJRefreshAutoNormalFooter.h>
 
 @interface HomeViewController () <UICollectionViewDelegate,UICollectionViewDataSource>
 
@@ -39,6 +43,12 @@
 
 //headTabView
 @property (nonatomic, strong)HeadTabView *headTabView;
+
+//refreshView
+@property (nonatomic, strong)RefreshView *refreshView;
+//MJRefresh提供的类
+@property (nonatomic, strong)MJRefreshNormalHeader *refreshHeader;
+@property (nonatomic, strong)MJRefreshAutoFooter *refreshFooter;
 
 @end
 
@@ -69,11 +79,12 @@
     layout.minimumInteritemSpacing = 0;
     layout.itemSize = CGSizeMake([UIScreen mainScreen].bounds.size.width, 200);
     layout.scrollDirection = UICollectionViewScrollDirectionVertical;
-    //layout.headerReferenceSize = CGSizeMake(self.view.bounds.size.width, 40);
+    //layout.headerReferenceSize = CGSizeMake(self.view.bounds.size.width, 30);
     
     //collectionView的frame
     rect = self.view.frame;
     rect.origin.y = CGRectGetMaxY(self.headTabView.frame);
+    rect.size.height = rect.size.height - rect.origin.y;
     self.collectionView = [[UICollectionView alloc] initWithFrame:rect collectionViewLayout:layout];
     self.collectionView.backgroundColor = [UIColor whiteColor];
     self.collectionView.delegate = self;
@@ -81,13 +92,31 @@
     //注册cell
     [self.collectionView registerClass:[MessageCollectionCell class] forCellWithReuseIdentifier:@"message"];
     //注册头视图
-    //[self.collectionView registerClass:[UICollectionReusableView class] forSupplementaryViewOfKind: UICollectionElementKindSectionHeader withReuseIdentifier:@"header"];
+    [self.collectionView registerClass:[UICollectionReusableView class] forSupplementaryViewOfKind: UICollectionElementKindSectionHeader withReuseIdentifier:@"header"];
     
     [self.view addSubview:_collectionView];
-    
+    //用来盖住顶部 防止毛玻璃效果
     UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, 91)];
     view.backgroundColor = [UIColor whiteColor];
     [self.view addSubview:view];
+    
+    //MJRefresh
+    //header
+    self.refreshHeader = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+        //进入刷新状态自动调用这个block
+        [self loadWeiboMessageWithAccess_token:self.account.access_token];
+    }];
+
+    self.collectionView.mj_header = _refreshHeader;
+    //footer
+    self.refreshFooter = [MJRefreshAutoFooter footerWithRefreshingBlock:^{
+        //进入刷新状态自动调用这个block
+        [self loadMoreMessageWithAccess_token:self.account.access_token];
+    }];
+    
+    self.collectionView.mj_footer = _refreshFooter;
+    
+    [self.view bringSubviewToFront:_headTabView];
 }
 
 #pragma mark - 观察者
@@ -208,19 +237,36 @@
 }
 
 #pragma mark - 检测tableview的偏移量
-- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
-    //上拉加载
-    if (scrollView.contentOffset.y + scrollView.frame.size.height >= scrollView.contentSize.height + [UIScreen mainScreen].bounds.size.height * 0.15) {
-        NSLog(@"上拉加载");
-        [self loadMoreMessageWithAccess_token:self.account.access_token];
-    }
+//- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
+//    //下拉刷新的分界线
+//    float line = 0.075 * [UIScreen mainScreen].bounds.size.height;
+//    
+//    if (scrollView.contentOffset.y <= -line) {
+//        NSLog(@"yes");
+//        //超过分界线
+//        //[_refreshView changeTheViewWithOverLine:YES];
+//        [_refreshHeader beginRefreshing];
+//    } else {
+//        NSLog(@"no");
+//        //没超过分界线
+//        //[_refreshView changeTheViewWithOverLine:NO];
+//        [_refreshHeader endRefreshing];
+//    }
+//}
 
+//- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
+//    //上拉加载
+//    if (scrollView.contentOffset.y + scrollView.frame.size.height >= scrollView.contentSize.height + [UIScreen mainScreen].bounds.size.height * 0.15) {
+//        NSLog(@"上拉加载");
+//        [self loadMoreMessageWithAccess_token:self.account.access_token];
+//    }
+//
     //下拉刷新
-    if (scrollView.contentOffset.y <= -[UIScreen mainScreen].bounds.size.height * 0.15) {
-        NSLog(@"下拉刷新");
-        [self loadWeiboMessageWithAccess_token:self.account.access_token];
-    }
-}
+//    if (scrollView.contentOffset.y <= -[UIScreen mainScreen].bounds.size.height * 0.15) {
+//        NSLog(@"下拉刷新");
+//        [self loadWeiboMessageWithAccess_token:self.account.access_token];
+//    }
+//}
 
 #pragma mark - 数据的懒加载
 //登陆的用户
@@ -267,140 +313,250 @@
 
 #pragma mark - 获取最新的微博数据
 - (void)loadWeiboMessageWithAccess_token:(NSString *)access_token {
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSString *baseURL = @"https://api.weibo.com/2/statuses/home_timeline.json";
+//    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+//        NSString *baseURL = @"https://api.weibo.com/2/statuses/home_timeline.json";
+//
+//        NSString *urlString = [NSString stringWithFormat:@"%@?access_token=%@",baseURL ,access_token];
+//
+//        NSURL *url = [NSURL URLWithString:urlString];
+//        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
+//
+//        NSURLSession *session = [NSURLSession sharedSession];
+//
+//        NSURLSessionTask *task = [session dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error)
+//        {
+//            if (error) {
+//                NSLog(@"%@",error);
+//                return;
+//            }
+//            //反序列化返回的数据
+//            NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:NULL];
+//
+//            //获取数据中的statuses数组
+//            NSMutableArray *dictArray = dict[@"statuses"];
+//
+//            //字典数组 转 模型数组
+//            NSMutableArray *messageFrameArray = [NSMutableArray array];
+//
+//            for (NSDictionary *dictionary in dictArray) {
+//                //微博数据
+//                WeiboMessage *message = [WeiboMessage messageWithDictionary:dictionary];
+//                //遍历看有无已经收藏了的微博
+//                for (WeiboMessage *likeMessage in self.likeMessageArray) {
+//                    if (likeMessage.ID == message.ID) { //同一条微博
+//                        message.likeMessage = likeMessage.likeMessage;
+//                    }
+//                }
+//
+//                //封装成frame模型
+//                WeiboMessageFrame *messageFrame = [[WeiboMessageFrame alloc] init];
+//                messageFrame.message = message;
+//                //frame模型数组
+//                [messageFrameArray addObject:messageFrame];
+//            }
+//            //添加自己发布的最新的一条微博
+//            NSMutableArray *launchMessageArray = [MessageTool launchMessageArray];
+//            if (launchMessageArray.count > 0) { //如果有发布微博
+//                WeiboMessage *launchMessage = [launchMessageArray objectAtIndex:0];
+//                //封装frame模型
+//            WeiboMessageFrame *messageFrame = [[WeiboMessageFrame alloc] init];
+//            messageFrame.message = launchMessage;
+//
+//            [messageFrameArray insertObject:messageFrame atIndex:0];
+//            }
+//            //对微博数据存储 和 将要显示的数据存储
+//            self.messageFrameArray = messageFrameArray;
+//
+//            [self updateShowMessageFrameArray];
+//            NSLog(@"网络请求完毕");
+//
+//            dispatch_sync(dispatch_get_main_queue(), ^{
+//                [self.collectionView reloadData];
+//            });
+//        }];
+//        //创建的task是停止状态，需要启动
+//        [task resume];
+//    });
+    
+    //创建管理器
+    AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
+    
+    //设置参数
+    NSMutableDictionary *param = [NSMutableDictionary dictionary];
+    param[@"access_token"] = access_token;
+    NSString *baseURL = @"https://api.weibo.com/2/statuses/home_timeline.json";
+    
+    //获取数据
+    [manager GET:baseURL parameters:param headers:nil progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+        //返回来的respinseObject是已经处理好的字典或数组
+        
+        //获取数据中的statuses数组
+        NSMutableArray *dictArray = responseObject[@"statuses"];
 
-        NSString *urlString = [NSString stringWithFormat:@"%@?access_token=%@",baseURL ,access_token];
+        //字典数组 转 模型数组
+        NSMutableArray *messageFrameArray = [NSMutableArray array];
 
-        NSURL *url = [NSURL URLWithString:urlString];
-        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
-
-        NSURLSession *session = [NSURLSession sharedSession];
-
-        NSURLSessionTask *task = [session dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error)
-        {
-            if (error) {
-                NSLog(@"%@",error);
-                return;
-            }
-            //反序列化返回的数据
-            NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:NULL];
-
-            //获取数据中的statuses数组
-            NSMutableArray *dictArray = dict[@"statuses"];
-
-            //字典数组 转 模型数组
-            NSMutableArray *messageFrameArray = [NSMutableArray array];
-
-            for (NSDictionary *dictionary in dictArray) {
-                //微博数据
-                WeiboMessage *message = [WeiboMessage messageWithDictionary:dictionary];
-                //遍历看有无已经收藏了的微博
-                for (WeiboMessage *likeMessage in self.likeMessageArray) {
-                    if (likeMessage.ID == message.ID) { //同一条微博
-                        message.likeMessage = likeMessage.likeMessage;
-                    }
+        for (NSDictionary *dictionary in dictArray) {
+            //微博数据
+            WeiboMessage *message = [WeiboMessage messageWithDictionary:dictionary];
+            //遍历看有无已经收藏了的微博
+            for (WeiboMessage *likeMessage in self.likeMessageArray) {
+                if (likeMessage.ID == message.ID) { //同一条微博
+                    message.likeMessage = likeMessage.likeMessage;
                 }
-
-                //封装成frame模型
-                WeiboMessageFrame *messageFrame = [[WeiboMessageFrame alloc] init];
-                messageFrame.message = message;
-                //frame模型数组
-                [messageFrameArray addObject:messageFrame];
             }
-            //添加自己发布的最新的一条微博
-            NSMutableArray *launchMessageArray = [MessageTool launchMessageArray];
-            if (launchMessageArray.count > 0) { //如果有发布微博
-                WeiboMessage *launchMessage = [launchMessageArray objectAtIndex:0];
-                //封装frame模型
+
+            //封装成frame模型
             WeiboMessageFrame *messageFrame = [[WeiboMessageFrame alloc] init];
-            messageFrame.message = launchMessage;
+            messageFrame.message = message;
+            //frame模型数组
+            [messageFrameArray addObject:messageFrame];
+        }
+        //添加自己发布的最新的一条微博
+        NSMutableArray *launchMessageArray = [MessageTool launchMessageArray];
+        if (launchMessageArray.count > 0) { //如果有发布微博
+            WeiboMessage *launchMessage = [launchMessageArray objectAtIndex:0];
+            //封装frame模型
+        WeiboMessageFrame *messageFrame = [[WeiboMessageFrame alloc] init];
+        messageFrame.message = launchMessage;
 
-            [messageFrameArray insertObject:messageFrame atIndex:0];
-            }
-            //对微博数据存储 和 将要显示的数据存储
-            self.messageFrameArray = messageFrameArray;
+        [messageFrameArray insertObject:messageFrame atIndex:0];
+        }
+        //对微博数据存储 和 将要显示的数据存储
+        self.messageFrameArray = messageFrameArray;
 
-            [self updateShowMessageFrameArray];
-            NSLog(@"网络请求完毕");
-
-            dispatch_sync(dispatch_get_main_queue(), ^{
-                [self.collectionView reloadData];
-            });
-        }];
-        //创建的task是停止状态，需要启动
-        [task resume];
-    });
+        [self updateShowMessageFrameArray];
+        NSLog(@"网络请求完毕");
+        
+        [self.collectionView reloadData];
+        
+        [self.collectionView.mj_header endRefreshing];
+    } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+        NSLog(@"%@",error);
+    }];
 }
 
 
 #pragma mark - 加载更早的微博数据
 - (void)loadMoreMessageWithAccess_token:(NSString *)access_token {
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        //获取max_id
-        WeiboMessageFrame *messageFrame = self.messageFrameArray.lastObject;
-        WeiboMessage *message = messageFrame.message;
-        NSNumber *max_id = message.ID;
-        //请求微博的数量
-        NSNumber *count = [NSNumber numberWithInt:10];
+    //创建管理器
+    AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
+    
+    ///设置参数
+    NSMutableDictionary *param = [NSMutableDictionary dictionary];
+    param[@"access_token"] = access_token;
+    //获取max_id
+    WeiboMessageFrame *messageFrame = self.messageFrameArray.lastObject;
+    WeiboMessage *message = messageFrame.message;
+    NSNumber *max_id = message.ID;
+    param[@"max_id"] = max_id;
+    //请求微博的数量
+    NSNumber *count = [NSNumber numberWithInt:10];
+    param[@"count"] = count;
+    NSString *baseURL = @"https://api.weibo.com/2/statuses/home_timeline.json";
+    
+    //获取数据
+    [manager GET:baseURL parameters:param headers:nil progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+        //返回来的respinseObject是已经处理好的字典或数组
+        //获取数据中的statuses数组
+        NSMutableArray *dictArray = responseObject[@"statuses"];
 
-        NSString *baseURL = @"https://api.weibo.com/2/statuses/home_timeline.json";
+        //字典数组 转 模型数组
+        NSMutableArray *messageFrameArray = [NSMutableArray array];
 
-        NSString *urlString = [NSString stringWithFormat:@"%@?access_token=%@&max_id=%@&count=%@",baseURL ,access_token, max_id, count];
-        NSURL *url = [NSURL URLWithString:urlString];
-        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
+        for (NSDictionary *dictionary in dictArray) {
+            //微博数据
+            WeiboMessage *message = [WeiboMessage messageWithDictionary:dictionary];
 
-        NSURLSession *session = [NSURLSession sharedSession];
-
-        NSURLSessionTask *task = [session dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error)
-        {
-            if (error) {
-                NSLog(@"%@",error);
-                return;
+            if (message.ID == max_id) {     //如果是已经存在的微博，就跳过
+                continue;
             }
-            //反序列化返回的数据
-            NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:NULL];
-
-            //获取数据中的statuses数组
-            NSMutableArray *dictArray = dict[@"statuses"];
-
-            //字典数组 转 模型数组
-            NSMutableArray *messageFrameArray = [NSMutableArray array];
-
-            for (NSDictionary *dictionary in dictArray) {
-                //微博数据
-                WeiboMessage *message = [WeiboMessage messageWithDictionary:dictionary];
-
-                if (message.ID == max_id) {     //如果是已经存在的微博，就跳过
-                    continue;
+            //遍历看有无已经收藏了的微博
+            for (WeiboMessage *likeMessage in self.likeMessageArray) {
+                if (likeMessage.ID == message.ID) { //同一条微博
+                    message.likeMessage = likeMessage.likeMessage;
                 }
-                //遍历看有无已经收藏了的微博
-                for (WeiboMessage *likeMessage in self.likeMessageArray) {
-                    if (likeMessage.ID == message.ID) { //同一条微博
-                        message.likeMessage = likeMessage.likeMessage;
-                    }
-                }
-
-                //封装成frame模型
-                WeiboMessageFrame *messageFrame = [[WeiboMessageFrame alloc] init];
-                messageFrame.message = message;
-                //frame模型数组
-                [messageFrameArray addObject:messageFrame];
             }
 
-            [self.messageFrameArray addObjectsFromArray:messageFrameArray];
+            //封装成frame模型
+            WeiboMessageFrame *messageFrame = [[WeiboMessageFrame alloc] init];
+            messageFrame.message = message;
+            //frame模型数组
+            [messageFrameArray addObject:messageFrame];
+        }
 
-            //更新展示的数组
-            [self updateShowMessageFrameArray];
-            NSLog(@"网络请求完毕");
+        [self.messageFrameArray addObjectsFromArray:messageFrameArray];
 
-            dispatch_sync(dispatch_get_main_queue(), ^{
-                [self.collectionView reloadData];
-            });
-        }];
-        //创建的task是停止状态，需要启动
-        [task resume];
-    });
+        //更新展示的数组
+        [self updateShowMessageFrameArray];
+        NSLog(@"网络请求完毕");
+
+        [self.collectionView reloadData];
+    } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+        NSLog(@"%@",error);
+    }];
+    
+    //加载完数据结束刷新状态
+    [self.collectionView.mj_footer endRefreshing];
+    
+//    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+//        NSString *baseURL = @"https://api.weibo.com/2/statuses/home_timeline.json";
+//
+//        NSString *urlString = [NSString stringWithFormat:@"%@?access_token=%@&max_id=%@&count=%@",baseURL ,access_token, max_id, count];
+//        NSURL *url = [NSURL URLWithString:urlString];
+//        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
+//
+//        NSURLSession *session = [NSURLSession sharedSession];
+//
+//        NSURLSessionTask *task = [session dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error)
+//        {
+//            if (error) {
+//                NSLog(@"%@",error);
+//                return;
+//            }
+//            //反序列化返回的数据
+//            NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:NULL];
+//
+//            //获取数据中的statuses数组
+//            NSMutableArray *dictArray = dict[@"statuses"];
+//
+//            //字典数组 转 模型数组
+//            NSMutableArray *messageFrameArray = [NSMutableArray array];
+//
+//            for (NSDictionary *dictionary in dictArray) {
+//                //微博数据
+//                WeiboMessage *message = [WeiboMessage messageWithDictionary:dictionary];
+//
+//                if (message.ID == max_id) {     //如果是已经存在的微博，就跳过
+//                    continue;
+//                }
+//                //遍历看有无已经收藏了的微博
+//                for (WeiboMessage *likeMessage in self.likeMessageArray) {
+//                    if (likeMessage.ID == message.ID) { //同一条微博
+//                        message.likeMessage = likeMessage.likeMessage;
+//                    }
+//                }
+//
+//                //封装成frame模型
+//                WeiboMessageFrame *messageFrame = [[WeiboMessageFrame alloc] init];
+//                messageFrame.message = message;
+//                //frame模型数组
+//                [messageFrameArray addObject:messageFrame];
+//            }
+//
+//            [self.messageFrameArray addObjectsFromArray:messageFrameArray];
+//
+//            //更新展示的数组
+//            [self updateShowMessageFrameArray];
+//            NSLog(@"网络请求完毕");
+//
+//            dispatch_sync(dispatch_get_main_queue(), ^{
+//                [self.collectionView reloadData];
+//            });
+//        }];
+//        //创建的task是停止状态，需要启动
+//        [task resume];
+//    });
 }
 
 
@@ -462,17 +618,16 @@
 
 //- (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath {
 //    if ([kind isEqual:UICollectionElementKindSectionHeader]) {
-//        
 //        UICollectionReusableView *headerView = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:@"header" forIndexPath:indexPath];
-//        
+//
 //        //headerTabBar
 //        CGFloat viewW = [UIScreen mainScreen].bounds.size.width;
-//        CGFloat viewH = 40;
+//        CGFloat viewH = 30;
 //        CGFloat viewX = 0;
 //        CGFloat viewY = 0;
-//        HeadTabView *headTabView = [[HeadTabView alloc] initWithFrame:CGRectMake(viewX, viewY, viewW, viewH)];
-//        
-//        [headerView addSubview:headTabView];
+//        self.refreshHeader = [[MJRefreshNormalHeader alloc] initWithFrame:CGRectMake(viewX, viewY, viewW, viewH)];
+//
+//        [headerView addSubview:_refreshHeader];
 //        return headerView;
 //    }
 //    return nil;

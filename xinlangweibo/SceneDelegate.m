@@ -71,12 +71,8 @@
         tabBar.tabBar.tintColor = [UIColor orangeColor];
         
         //tabbar添加控制器
-//        _homeTableViewController = [[HomeTableViewController alloc] init];
-//        [self tabBar:tabBar addChildViewController: _homeTableViewController  withTitle:@"主页" withImage:@"主页"];
-        
         _homeViewController = [[HomeViewController alloc] init];
         [self tabBar:tabBar addChildViewController:_homeViewController withTitle:@"主页" withImage:@"主页"];
-        
         _messageTableViewController = [[MessageTableViewController alloc] init];
         [self tabBar:tabBar addChildViewController: _messageTableViewController withTitle:@"消息" withImage:@"消息"];
         _launchTableViewController = [[LaunchViewController alloc] init];
